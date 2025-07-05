@@ -9,6 +9,7 @@ import tseslint from 'typescript-eslint';
 
 export default defineConfig([
   importPlugin.flatConfigs.typescript,
+  tseslint.configs.recommended,
   {
     files: ['**/*.{js,mjs,cjs,ts,mts,cts}'],
     plugins: { js },
@@ -18,7 +19,6 @@ export default defineConfig([
     files: ['**/*.{js,mjs,cjs,ts,mts,cts}'],
     languageOptions: { globals: globals.node },
   },
-  tseslint.configs.recommended,
   {
     files: ['**/*.json'],
     plugins: { json },
@@ -31,6 +31,7 @@ export default defineConfig([
     language: 'markdown/gfm',
     extends: ['markdown/recommended'],
   },
+  eslintConfigPrettier,
   tseslint.config({
     files: ['**/*.ts'],
     languageOptions: {
@@ -50,7 +51,6 @@ export default defineConfig([
       '@typescript-eslint/consistent-type-exports': 'error',
     },
   }),
-  eslintConfigPrettier,
   {
     files: ['**/*.{js,mjs,cjs,ts,mts,cts}'],
     rules: {

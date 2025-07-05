@@ -8,10 +8,10 @@ import fastify from 'fastify';
 import { createTRPCContext } from './context';
 import { appRouter, type tAppRouter } from './router';
 
-async function main() {
+async function main () {
   const server = fastify();
 
-  server.get('/', async function handler() {
+  server.get('/', async function handler () {
     return { hello: 'world' };
   });
 

@@ -1,55 +1,13 @@
-import js from '@eslint/js';
-import json from '@eslint/json';
-import markdown from '@eslint/markdown';
-import { defineConfig } from 'eslint/config';
-import eslintConfigPrettier from 'eslint-config-prettier/flat';
-import importPlugin from 'eslint-plugin-import';
-import globals from 'globals';
-import tseslint from 'typescript-eslint';
+// https://docs.expo.dev/guides/using-eslint/
+const expoConfig = require('eslint-config-expo/flat');
+const eslintConfigPrettier = require('eslint-config-prettier/flat');
+const { defineConfig } = require('eslint/config');
 
-export default defineConfig([
-  importPlugin.flatConfigs.typescript,
+module.exports = defineConfig([
+  expoConfig,
   {
-    files: ['**/*.{js,mjs,cjs,ts,mts,cts}'],
-    plugins: { js },
-    extends: ['js/recommended'],
+    ignores: ['dist/*'],
   },
-  {
-    files: ['**/*.{js,mjs,cjs,ts,mts,cts}'],
-    languageOptions: { globals: globals.node },
-  },
-  tseslint.configs.recommended,
-  {
-    files: ['**/*.json'],
-    plugins: { json },
-    language: 'json/jsonc',
-    extends: ['json/recommended'],
-  },
-  {
-    files: ['**/*.md'],
-    plugins: { markdown },
-    language: 'markdown/gfm',
-    extends: ['markdown/recommended'],
-  },
-  tseslint.config({
-    files: ['**/*.ts'],
-    languageOptions: {
-      parserOptions: {
-        project: './tsconfig.json',
-        tsconfigRootDir: import.meta.dirname,
-      },
-    },
-    rules: {
-      '@typescript-eslint/consistent-type-imports': [
-        'error',
-        {
-          fixStyle: 'inline-type-imports',
-          prefer: 'type-imports',
-        },
-      ],
-      '@typescript-eslint/consistent-type-exports': 'error',
-    },
-  }),
   eslintConfigPrettier,
   {
     files: ['**/*.{js,mjs,cjs,ts,mts,cts}'],
@@ -148,7 +106,6 @@ export default defineConfig([
       ],
       eqeqeq: 'error',
       'no-empty': 'error',
-      '@typescript-eslint/no-explicit-any': 'warn',
     },
   },
 ]);

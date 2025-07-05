@@ -1,9 +1,4 @@
-import type { CreateFastifyContextOptions } from '@trpc/server/adapters/fastify';
-
-export async function createTRPCContext ({
-  req,
-  res,
-}: CreateFastifyContextOptions) {
+export async function createTRPCContext () {
   // @todo retrieve currently logged in user from req.headers.authorization
   // @todo retrieve user information from database through session id in authorization
   return {};

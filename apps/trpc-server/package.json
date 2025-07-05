@@ -8,7 +8,8 @@
     "ts-check": "tsc --noEmit",
     "eslint": "eslint . --fix",
     "prettier": "prettier . --write",
-    "lint": "pnpm run prettier && pnpm run eslint"
+    "lint": "pnpm run prettier && pnpm run eslint",
+    "lint-staged": "lint-staged"
   },
   "keywords": [],
   "author": {
@@ -32,9 +33,18 @@
     "eslint-config-prettier": "^10.1.5",
     "eslint-plugin-import": "^2.32.0",
     "globals": "^16.2.0",
+    "lint-staged": "^16.1.2",
     "nodemon": "^3.1.10",
     "prettier": "^3.6.0",
     "ts-node": "^10.9.2",
     "typescript-eslint": "^8.35.0"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx,css,scss,html,json,md,yml,yaml}": [
+      "prettier --write"
+    ],
+    "*.{js,jsx,ts,tsx}": [
+      "eslint --fix"
+    ]
   }
 }

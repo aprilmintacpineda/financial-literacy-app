@@ -1,14 +1,17 @@
 {
-  "name": "entrepic",
+  "name": "@apps/expo-app",
   "main": "expo-router/entry",
   "version": "1.0.0",
+  "private": true,
   "scripts": {
     "dev": "expo start",
     "reset-project": "node ./scripts/reset-project.js",
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "lint": "expo lint"
+    "lint": "expo lint",
+    "ts-check": "tsc --noEmit",
+    "lint-staged": "lint-staged"
   },
   "dependencies": {
     "@expo/vector-icons": "^14.1.0",
@@ -44,7 +47,15 @@
     "eslint": "^9.25.0",
     "eslint-config-expo": "~9.2.0",
     "eslint-config-prettier": "^10.1.5",
+    "lint-staged": "^16.1.2",
     "typescript": "~5.8.3"
   },
-  "private": true
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx,css,scss,html,json,md,yml,yaml}": [
+      "prettier --write"
+    ],
+    "*.{js,jsx,ts,tsx}": [
+      "eslint --fix"
+    ]
+  }
 }

@@ -6,5 +6,3 @@ export const appRouter = trpc.router({
   greetQuery,
   listUsersQuery,
 });
-
-export type tAppRouter = typeof appRouter;

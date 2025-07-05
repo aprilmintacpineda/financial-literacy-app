@@ -5,8 +5,9 @@ import {
   type FastifyTRPCPluginOptions,
 } from '@trpc/server/adapters/fastify';
 import fastify from 'fastify';
+import { type tAppRouter } from './app-router';
 import { createTRPCContext } from './context';
-import { appRouter, type tAppRouter } from './router';
+import { appRouter } from './router';
 
 async function main () {
   const server = fastify();

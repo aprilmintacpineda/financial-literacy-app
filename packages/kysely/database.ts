@@ -7,7 +7,7 @@ export const database = new Kysely<DB>({
   dialect: new MysqlDialect({
     pool: createPool({
       uri: env.DATABASE_URL,
-      connectionLimit: 30,
+      connectionLimit: 10,
     }),
   }),
   log: env.NODE_ENV === 'development' ? ['query'] : undefined,

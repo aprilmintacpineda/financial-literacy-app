@@ -12,7 +12,7 @@
     "migrate:up": "kysely migrate:up",
     "migrate:down": "kysely migrate:down",
     "migrate:make": "kysely migrate:make",
-    "migrate:rollback": "kysely migrate:rollback",
+    "migrate:rollback:all": "kysely migrate:rollback --all",
     "seed:run": "kysely seed:run",
     "seed:make": "kysely seed:make",
     "codegen": "kysely-codegen --out-file models.ts",

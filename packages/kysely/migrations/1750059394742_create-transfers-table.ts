@@ -5,15 +5,15 @@ import { cuid } from '../utils/types';
 // `any` is required here since migrations should be frozen in time. alternatively, keep a "snapshot" db interface.
 export async function up (db: Kysely<any>): Promise<void> {
   await createBaseTable(db, 'transfers')
-    .addColumn('id', cuid, col => col.primaryKey())
-    .addColumn('organizationId', cuid)
-    .addColumn('fromWalletId', cuid)
-    .addColumn('toWalletId', cuid)
+    .addColumn('id', cuid, col => col.primaryKey().notNull())
+    .addColumn('organizationId', cuid, col => col.notNull())
+    .addColumn('fromWalletId', cuid, col => col.notNull())
+    .addColumn('toWalletId', cuid, col => col.notNull())
     .addColumn('description', 'varchar(255)')
-    .addColumn('originalAmount', 'bigint')
-    .addColumn('transferedAmount', 'bigint')
-    .addColumn('exchangeRate', 'bigint')
-    .addColumn('transferDate', 'datetime')
+    .addColumn('originalAmount', 'bigint', col => col.notNull())
+    .addColumn('transferedAmount', 'bigint', col => col.notNull())
+    .addColumn('exchangeRate', 'bigint', col => col.notNull())
+    .addColumn('transferDate', 'date', col => col.notNull())
     .execute();
 
   await db.schema
@@ -32,6 +32,12 @@ export async function up (db: Kysely<any>): Promise<void> {
     .createIndex('toWalletId_idx')
     .on('transfers')
     .column('toWalletId')
+    .execute();
+
+  await db.schema
+    .createIndex('transferDate_idx')
+    .on('transfers')
+    .column('transferDate')
     .execute();
 }
 

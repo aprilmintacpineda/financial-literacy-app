@@ -7,7 +7,7 @@ export function createJwt (id: string) {
       { id },
       env.JWT_SECRET,
       {
-        expiresIn: 60,
+        expiresIn: '7d',
       },
       (error, token) => {
         if (error) reject(error);

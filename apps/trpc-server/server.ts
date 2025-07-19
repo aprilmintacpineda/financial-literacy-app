@@ -21,17 +21,20 @@ async function main () {
     trpcOptions: {
       router: appRouter,
       createContext: createTRPCContext,
-      // @todo report errors to sentry
-      // onError({ path, error }) {
-      //   console.error(`Error in tRPC handler on path '${path}':`, error);
-      // },
+      onError ({ path, error }) {
+        // @todo report errors to sentry
+        console.error(
+          `Error in tRPC handler on path '${path}':`,
+          error,
+        );
+      },
     } satisfies FastifyTRPCPluginOptions<tAppRouter>['trpcOptions'],
   });
 
   try {
     await server.listen({ port: 3000 });
   } catch (err) {
-    server.log.error(err);
+    console.log(err);
     process.exit(1);
   }
 }

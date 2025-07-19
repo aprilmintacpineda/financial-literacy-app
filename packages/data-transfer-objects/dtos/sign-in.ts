@@ -1,16 +1,13 @@
 import z from 'zod';
 
-export const signUpDto = z.object({
+export const signInDto = z.object({
   email: z
     .string({ invalid_type_error: 'Email must be a string' })
     .nonempty('Please enter your email')
     .email('Please enter your email'),
   password: z
     .string({ invalid_type_error: 'Password must be a string' })
-    .nonempty('Please enter your desired password'),
-  name: z
-    .string({ invalid_type_error: 'Name must be a string' })
-    .nonempty('Please enter your name'),
+    .nonempty('Please enter your password'),
 });
 
-export type SignUpDto = z.infer<typeof signUpDto>;
+export type signInDto = z.infer<typeof signInDto>;

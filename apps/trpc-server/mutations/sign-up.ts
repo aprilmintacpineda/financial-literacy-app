@@ -1,0 +1,35 @@
+import { signUpDto } from '@packages/data-transfer-objects';
+import { database } from '@packages/kysely';
+import { createId } from '@paralleldrive/cuid2';
+import { TRPCError } from '@trpc/server';
+import bcrypt from 'bcrypt';
+import { publicProcedure } from '../trpc';
+
+const signUpMutation = publicProcedure
+  .input(signUpDto)
+  .mutation(async ({ input: { email, password, name } }) => {
+    const user = await database
+      .selectFrom('users')
+      .selectAll()
+      .where('email', '=', email)
+      .executeTakeFirst();
+
+    if (user) throw new TRPCError({ code: 'CONFLICT' });
+
+    const hashedPassword = await bcrypt.hash(password, 12);
+    const now = new Date();
+
+    await database
+      .insertInto('users')
+      .values({
+        id: createId(),
+        email,
+        password: hashedPassword,
+        name,
+        updatedAt: now,
+        createdAt: now,
+      })
+      .execute();
+  });
+
+export default signUpMutation;

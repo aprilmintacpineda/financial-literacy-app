@@ -1,8 +1,11 @@
-import greetQuery from './queries/greet';
-import listUsersQuery from './queries/list-users';
+import signInMutation from './mutations/sign-in';
+import signUpMutation from './mutations/sign-up';
+import validateTokenMutation from './mutations/validate-token';
 import { trpc } from './trpc';
 
 export const appRouter = trpc.router({
-  greetQuery,
-  listUsersQuery,
+  // mutations
+  signUpMutation,
+  signInMutation,
+  validateTokenMutation,
 });

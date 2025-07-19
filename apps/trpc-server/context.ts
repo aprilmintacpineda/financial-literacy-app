@@ -1,7 +1,36 @@
-export async function createTRPCContext () {
-  // @todo retrieve currently logged in user from req.headers.authorization
-  // @todo retrieve user information from database through session id in authorization
-  return {};
+import { database } from '@packages/kysely';
+import { type CreateFastifyContextOptions } from '@trpc/server/adapters/fastify';
+import { type Users } from '../../packages/kysely/models';
+import { verifyJwt } from './utils/jwt';
+
+export async function createTRPCContext ({
+  req,
+}: CreateFastifyContextOptions) {
+  let user: Users | null = null;
+
+  try {
+    const authorization = req.headers['authorization'];
+
+    if (authorization) {
+      const token = authorization.replace('Bearer ', '');
+      const id = await verifyJwt(token);
+
+      user = await database
+        .selectFrom('users')
+        .selectAll()
+        .where('id', '=', id)
+        .executeTakeFirstOrThrow();
+    }
+  } catch (_error) {
+    console.log(_error);
+    // @todo maybe log to sentry?
+  }
+
+  return {
+    user,
+  };
 }
 
-export type Context = Awaited<ReturnType<typeof createTRPCContext>>;
+export type tTRPCContext = Awaited<
+  ReturnType<typeof createTRPCContext>
+>;

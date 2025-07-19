@@ -1,0 +1,58 @@
+import 'react-native-reanimated';
+import '../global.css';
+
+import {
+  QueryClient,
+  QueryClientProvider,
+} from '@tanstack/react-query';
+import { httpBatchLink } from '@trpc/client';
+import { useFonts } from 'expo-font';
+import { SplashScreen } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
+import { useEffect, useMemo } from 'react';
+import Theme from '../components/theme';
+import { useAuthContext } from '../contexts/auth';
+import { trpc } from '../utils/trpc';
+import Routes from './routes';
+
+SplashScreen.preventAutoHideAsync();
+
+export default function Main () {
+  const queryClient = useMemo(() => new QueryClient(), []);
+  const { token, status } = useAuthContext();
+
+  const [loaded, error] = useFonts({
+    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
+  });
+
+  useEffect(() => {
+    if (status === 'done' && (loaded || error))
+      SplashScreen.hideAsync();
+  }, [loaded, error, status]);
+
+  const trpcClient = useMemo(() => {
+    return trpc.createClient({
+      links: [
+        httpBatchLink({
+          url: 'http://localhost:3000/trpc',
+          headers: () => {
+            const headers = new Headers();
+            headers.set('Authorization', `Bearer ${token}`);
+            return headers;
+          },
+        }),
+      ],
+    });
+  }, [token]);
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <trpc.Provider client={trpcClient} queryClient={queryClient}>
+        <Theme>
+          <StatusBar style="auto" translucent />
+          <Routes />
+        </Theme>
+      </trpc.Provider>
+    </QueryClientProvider>
+  );
+}

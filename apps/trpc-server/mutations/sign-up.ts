@@ -16,20 +16,44 @@ const signUpMutation = publicProcedure
 
     if (user) throw new TRPCError({ code: 'CONFLICT' });
 
-    const hashedPassword = await bcrypt.hash(password, 12);
-    const now = new Date();
+    await database.transaction().execute(async trx => {
+      const hashedPassword = await bcrypt.hash(password, 12);
+      const now = new Date();
+      const userId = createId();
+      const organizationId = createId();
 
-    await database
-      .insertInto('users')
-      .values({
-        id: createId(),
-        email,
-        password: hashedPassword,
-        name,
-        updatedAt: now,
-        createdAt: now,
-      })
-      .execute();
+      await trx
+        .insertInto('users')
+        .values({
+          id: userId,
+          email,
+          password: hashedPassword,
+          name,
+          updatedAt: now,
+          createdAt: now,
+        })
+        .execute();
+
+      await trx
+        .insertInto('organizations')
+        .values({
+          id: organizationId,
+          name: 'Personal Finance',
+          createdAt: now,
+          updatedAt: now,
+        })
+        .execute();
+
+      await trx
+        .insertInto('organization_users')
+        .values({
+          userId,
+          organizationId,
+          createdAt: now,
+          updatedAt: now,
+        })
+        .execute();
+    });
   });
 
 export default signUpMutation;

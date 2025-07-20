@@ -6,26 +6,29 @@ import { trpc } from '../utils/trpc';
 
 export default function Routes () {
   const { mutateAsync } = trpc.validateTokenMutation.useMutation();
-  const { status, token, restoredAuth, setToken } = useAuthContext();
+  const { status, token, clearAuth, setUserData, setToken } =
+    useAuthContext();
 
   useEffect(() => {
     if (status !== 'initial') return;
 
     async function validateToken () {
       try {
-        await mutateAsync();
-        restoredAuth();
+        const publicUserData = await mutateAsync();
+        setUserData(publicUserData);
       } catch (_error) {
         // @todo maybe log in sentry?
         console.log(_error);
-        restoredAuth(true);
+
+        await secureStore.deleteItemAsync('token');
+        clearAuth();
       }
     }
 
     async function restoreToken () {
       const token = await secureStore.getItemAsync('token');
       if (token) setToken(token);
-      else restoredAuth(true);
+      else clearAuth();
     }
 
     if (token) validateToken();

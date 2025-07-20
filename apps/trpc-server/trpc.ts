@@ -1,7 +1,10 @@
 import { initTRPC, TRPCError } from '@trpc/server';
+import SuperJSON from 'superjson';
 import { type tTRPCContext } from './context';
 
-export const trpc = initTRPC.context<tTRPCContext>().create();
+export const trpc = initTRPC.context<tTRPCContext>().create({
+  transformer: SuperJSON,
+});
 
 export const publicProcedure = trpc.procedure;
 

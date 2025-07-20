@@ -1,4 +1,4 @@
-import { vars } from 'nativewind';
+import { useColorScheme } from 'nativewind';
 
 const theme = {
   '--color-white': 'rgb(255, 255, 255)',
@@ -38,9 +38,12 @@ const theme = {
   '--color-disabled-border': 'rgb(220, 215, 220)',
 };
 
-const themes = {
-  light: vars(theme),
-  dark: vars(theme),
+export const themeColors = {
+  dark: theme,
+  light: theme,
 };
 
-export default themes;
+export function useThemeColors () {
+  const { colorScheme } = useColorScheme();
+  return themeColors[colorScheme ?? 'light'];
+}

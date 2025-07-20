@@ -15,13 +15,15 @@
     "migrate:rollback:all": "kysely migrate:rollback --all",
     "seed:run": "kysely seed:run",
     "seed:make": "kysely seed:make",
-    "codegen": "kysely-codegen --out-file models.ts",
+    "codegen": "kysely-codegen --out-file database-types.ts",
     "lint-staged": "lint-staged"
   },
   "keywords": [],
   "author": "",
   "license": "UNLICENSED",
   "dependencies": {
+    "@paralleldrive/cuid2": "^2.2.2",
+    "bcrypt": "^6.0.0",
     "kysely": "^0.28.2",
     "kysely-codegen": "^0.18.5",
     "kysely-ctl": "^0.13.1",
@@ -31,6 +33,8 @@
     "@eslint/js": "^9.30.0",
     "@eslint/json": "^0.12.0",
     "@eslint/markdown": "^6.6.0",
+    "@packages/data-transfer-objects": "workspace:*",
+    "@types/bcrypt": "^5.0.2",
     "@types/node": "^24.0.7",
     "eslint": "^9.30.0",
     "eslint-config-prettier": "^10.1.5",
@@ -41,9 +45,8 @@
     "zod": "^3.25.67"
   },
   "exports": {
-    ".": [
-      "./database.ts"
-    ]
+    "./repositories": "./repositories/index.ts",
+    "./models": "./models/index.ts"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx,css,scss,html,json,md,yml,yaml}": [

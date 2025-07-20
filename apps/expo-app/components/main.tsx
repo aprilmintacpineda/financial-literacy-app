@@ -10,6 +10,7 @@ import { useFonts } from 'expo-font';
 import { SplashScreen } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useMemo } from 'react';
+import SuperJSON from 'superjson';
 import Theme from '../components/theme';
 import { useAuthContext } from '../contexts/auth';
 import { trpc } from '../utils/trpc';
@@ -34,10 +35,14 @@ export default function Main () {
     return trpc.createClient({
       links: [
         httpBatchLink({
+          transformer: SuperJSON,
           url: 'http://localhost:3000/trpc',
           headers: () => {
             const headers = new Headers();
-            headers.set('Authorization', `Bearer ${token}`);
+
+            if (token)
+              headers.set('Authorization', `Bearer ${token}`);
+
             return headers;
           },
         }),

@@ -1,3 +1,4 @@
+import { type PublicUserData } from '@apps/trpc-server';
 import {
   createContext,
   type PropsWithChildren,
@@ -8,13 +9,15 @@ import {
 } from 'react';
 
 interface iState {
-  token?: string;
   status: 'initial' | 'done';
+  token?: string;
+  publicUserData?: PublicUserData;
 }
 
 type tAuthContext = iState & {
   setToken: (token: string) => void;
-  restoredAuth: (clearToken?: boolean) => void;
+  setUserData: (publicUserData: PublicUserData) => void;
+  clearAuth: () => void;
 };
 
 const AuthContext = createContext<tAuthContext>({} as tAuthContext);
@@ -35,12 +38,26 @@ export function AuthContextProvider ({
     });
   }, []);
 
-  const restoredAuth = useCallback((clearToken?: boolean) => {
+  const setUserData = useCallback(
+    (publicUserData: PublicUserData) => {
+      setState(oldState => {
+        return {
+          ...oldState,
+          status: 'done',
+          publicUserData,
+        };
+      });
+    },
+    [],
+  );
+
+  const clearAuth = useCallback(() => {
     setState(oldState => {
       return {
         ...oldState,
         status: 'done',
-        token: clearToken ? undefined : oldState.token,
+        publicUserData: undefined,
+        token: undefined,
       };
     });
   }, []);
@@ -49,9 +66,10 @@ export function AuthContextProvider ({
     return {
       ...state,
       setToken,
-      restoredAuth,
+      setUserData,
+      clearAuth,
     };
-  }, [state, restoredAuth]);
+  }, [state, setUserData]);
 
   return (
     <AuthContext.Provider value={value}>

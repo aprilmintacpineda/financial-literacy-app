@@ -1,7 +1,7 @@
 import { Kysely, MysqlDialect } from 'kysely';
 import { createPool } from 'mysql2';
+import { type DB } from './database-types';
 import env from './env';
-import { type DB } from './models';
 
 export const database = new Kysely<DB>({
   dialect: new MysqlDialect({

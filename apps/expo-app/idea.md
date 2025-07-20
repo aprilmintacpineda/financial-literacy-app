@@ -1,0 +1,17 @@
+- stack (sign in)
+  - sign up
+  - Private (drawer)
+    - (tab)
+      - transactions
+      - transfers
+      - wallets
+      - categories
+      - tags
+    - Switch Team
+    - Manage Team
+      - Settings (stack)
+      - Users
+    - Manage Account
+      - Settings
+      - Change password
+    - Sign out

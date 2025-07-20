@@ -1,12 +1,12 @@
-import { database } from '@packages/kysely';
+import { type UserModel } from '@packages/kysely/models';
+import { UsersRepository } from '@packages/kysely/repositories';
 import { type CreateFastifyContextOptions } from '@trpc/server/adapters/fastify';
-import { type Users } from '../../packages/kysely/models';
 import { verifyJwt } from './utils/jwt';
 
 export async function createTRPCContext ({
   req,
 }: CreateFastifyContextOptions) {
-  let user: Users | null = null;
+  let user: UserModel | null = null;
 
   try {
     const authorization = req.headers['authorization'];
@@ -14,12 +14,7 @@ export async function createTRPCContext ({
     if (authorization) {
       const token = authorization.replace('Bearer ', '');
       const id = await verifyJwt(token);
-
-      user = await database
-        .selectFrom('users')
-        .selectAll()
-        .where('id', '=', id)
-        .executeTakeFirstOrThrow();
+      user = await UsersRepository.getUserById(id);
     }
   } catch (_error) {
     console.log(_error);

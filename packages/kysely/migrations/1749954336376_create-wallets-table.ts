@@ -1,4 +1,4 @@
-import type { Kysely } from 'kysely';
+import { sql, type Kysely } from 'kysely';
 import { createBaseTable } from '../utils/schema';
 import { cuid, names } from '../utils/types';
 
@@ -9,7 +9,9 @@ export async function up (db: Kysely<any>): Promise<void> {
     .addColumn('organizationId', cuid, col => col.notNull())
     .addColumn('name', names, col => col.notNull())
     .addColumn('amount', 'bigint', col => col.notNull())
-    .addColumn('walletType', 'varchar(6)', col => col.notNull())
+    .addColumn('walletType', sql`enum('debit', 'credit')`, col =>
+      col.notNull(),
+    )
     .addColumn('currency', 'varchar(3)', col => col.notNull())
     .execute();
 

@@ -55,6 +55,7 @@ export default defineConfig([
         },
       ],
       '@typescript-eslint/consistent-type-exports': 'error',
+      '@typescript-eslint/no-explicit-any': 'warn',
     },
   }),
   {

@@ -1,4 +1,4 @@
-import { type SignUpDto } from '@packages/data-transfer-objects';
+import { type SignUpDto } from '@packages/data-transfer-objects/dtos';
 import { createId } from '@paralleldrive/cuid2';
 import bcrypt from 'bcrypt';
 import { database } from '../database';

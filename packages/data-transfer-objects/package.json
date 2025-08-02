@@ -29,9 +29,8 @@
     "typescript-eslint": "^8.35.0"
   },
   "exports": {
-    ".": [
-      "./index.ts"
-    ]
+    "./dtos": "./dtos/index.ts",
+    "./enums": "./enums/index.ts"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx,css,scss,html,json,md,yml,yaml}": [

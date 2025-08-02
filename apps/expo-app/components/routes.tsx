@@ -15,7 +15,7 @@ export default function Routes () {
     async function validateToken () {
       try {
         const publicUserData = await mutateAsync();
-        setUserData(publicUserData);
+        setUserData(publicUserData, publicUserData.organizations[0]);
       } catch (_error) {
         // @todo maybe log in sentry?
         console.log(_error);

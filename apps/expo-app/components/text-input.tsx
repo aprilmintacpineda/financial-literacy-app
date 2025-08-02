@@ -2,12 +2,9 @@ import { type ComponentProps } from 'react';
 import { TextInput as RNTextInput, Text, View } from 'react-native';
 import { twJoin, twMerge } from 'tailwind-merge';
 
-type tProps = Omit<
-  ComponentProps<typeof RNTextInput>,
-  'className' | 'editable'
-> & {
+type tProps = ComponentProps<typeof RNTextInput> & {
   errorMessage?: string | null;
-  label: string;
+  label?: string;
   isDisabled?: boolean;
 };
 
@@ -15,18 +12,23 @@ export default function TextInput ({
   errorMessage,
   label,
   isDisabled,
+  editable,
+  className,
   ...rnTextInputProps
 }: tProps) {
   return (
     <View>
-      <Text
-        className={twJoin(
-          'mb-1 font-semibold',
-          errorMessage && 'text-error-text',
-        )}
-      >
-        {label}
-      </Text>
+      {label && (
+        <Text
+          className={twJoin(
+            'mb-1 font-semibold',
+            errorMessage && 'text-error-text',
+            className,
+          )}
+        >
+          {label}
+        </Text>
+      )}
       <RNTextInput
         className={twMerge(
           'rounded-lg border border-borders p-3',
@@ -34,7 +36,7 @@ export default function TextInput ({
           isDisabled &&
             'border-disabled-border bg-disabled-bg text-disabled-text',
         )}
-        editable={!isDisabled}
+        editable={!isDisabled && editable}
         {...rnTextInputProps}
       />
       <Text className="mb-1 text-sm text-error-text">

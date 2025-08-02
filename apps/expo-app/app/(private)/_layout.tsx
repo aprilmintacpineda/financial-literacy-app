@@ -1,7 +1,7 @@
 import { Stack } from 'expo-router';
 import { useThemeColors } from '../../themes';
 
-export default function PrivateLayout () {
+export default function PrivateStackRoutes () {
   const themeColors = useThemeColors();
 
   return (
@@ -10,12 +10,29 @@ export default function PrivateLayout () {
         headerStyle: {
           backgroundColor: themeColors['--color-primary'],
         },
-        headerTitleStyle: {
-          color: themeColors['--color-primary-contrast-text'],
-        },
+        headerTintColor:
+          themeColors['--color-primary-contrast-text'],
+        headerBackButtonDisplayMode: 'minimal',
       }}
     >
-      <Stack.Screen name="transactions" />
+      <Stack.Screen
+        name="(tabs)"
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="change-account-details"
+        options={{
+          title: 'Change Account Details',
+        }}
+      />
+      <Stack.Screen
+        name="add-wallet"
+        options={{
+          presentation: 'modal',
+        }}
+      />
     </Stack>
   );
 }

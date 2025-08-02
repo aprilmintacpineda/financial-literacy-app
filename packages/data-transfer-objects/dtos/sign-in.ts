@@ -10,4 +10,4 @@ export const signInDto = z.object({
     .nonempty('Please enter your password'),
 });
 
-export type signInDto = z.infer<typeof signInDto>;
+export type SignInDto = z.infer<typeof signInDto>;

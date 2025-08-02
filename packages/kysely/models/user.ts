@@ -2,7 +2,7 @@ import bcrypt from 'bcrypt';
 import { type Organizations, type Users } from '../database-types';
 import { OrganizationModel } from './organization';
 
-export class UserModel {
+export class UserModel implements Omit<Users, 'deletedAt'> {
   private data: Omit<Users, 'deletedAt'> & {
     organizations: OrganizationModel[];
   };
@@ -21,6 +21,12 @@ export class UserModel {
 
   isPasswordCorrect (password: string) {
     return bcrypt.compare(password, this.data.password);
+  }
+
+  isPartOfOrganization (organizationId: string) {
+    return this.data.organizations.some(
+      organization => organization.id === organizationId,
+    );
   }
 
   get publicData () {

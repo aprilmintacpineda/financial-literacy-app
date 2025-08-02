@@ -12,12 +12,21 @@ interface iState {
   status: 'initial' | 'done';
   token?: string;
   publicUserData?: PublicUserData;
+  activeOrganization?: PublicUserData['organizations'][number];
 }
 
 type tAuthContext = iState & {
   setToken: (token: string) => void;
-  setUserData: (publicUserData: PublicUserData) => void;
+  setUserData: (
+    publicUserData: PublicUserData,
+    activeOrganization: PublicUserData['organizations'][number]
+  ) => void;
   clearAuth: () => void;
+  login: (
+    token: string,
+    publicUserData: PublicUserData,
+    activeOrganization: PublicUserData['organizations'][number]
+  ) => void;
 };
 
 const AuthContext = createContext<tAuthContext>({} as tAuthContext);
@@ -38,13 +47,36 @@ export function AuthContextProvider ({
     });
   }, []);
 
+  const login = useCallback(
+    (
+      token: string,
+      publicUserData: PublicUserData,
+      activeOrganization: PublicUserData['organizations'][number],
+    ) => {
+      setState(oldState => {
+        return {
+          ...oldState,
+          token,
+          publicUserData,
+          activeOrganization,
+          status: 'done',
+        };
+      });
+    },
+    [],
+  );
+
   const setUserData = useCallback(
-    (publicUserData: PublicUserData) => {
+    (
+      publicUserData: PublicUserData,
+      activeOrganization: PublicUserData['organizations'][number],
+    ) => {
       setState(oldState => {
         return {
           ...oldState,
           status: 'done',
           publicUserData,
+          activeOrganization,
         };
       });
     },
@@ -68,6 +100,7 @@ export function AuthContextProvider ({
       setToken,
       setUserData,
       clearAuth,
+      login,
     };
   }, [state, setUserData]);
 

@@ -15,7 +15,7 @@
     "migrate:rollback:all": "kysely migrate:rollback --all",
     "seed:run": "kysely seed:run",
     "seed:make": "kysely seed:make",
-    "codegen": "kysely-codegen --out-file database-types.ts",
+    "codegen": "tsx generate-codegen-config.ts && kysely-codegen --out-file database-types.ts --dialect mysql",
     "lint-staged": "lint-staged"
   },
   "keywords": [],
@@ -41,6 +41,7 @@
     "eslint-plugin-import": "^2.32.0",
     "globals": "^16.2.0",
     "lint-staged": "^16.1.2",
+    "tsx": "^4.20.3",
     "typescript-eslint": "^8.35.0",
     "zod": "^3.25.67"
   },

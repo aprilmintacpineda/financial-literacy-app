@@ -1,4 +1,4 @@
-import { signInDto } from '@packages/data-transfer-objects';
+import { signInDto } from '@packages/data-transfer-objects/dtos';
 import { UsersRepository } from '@packages/kysely/repositories';
 import { TRPCError } from '@trpc/server';
 import { publicProcedure } from '../trpc';
@@ -13,7 +13,11 @@ const signInMutation = publicProcedure
       throw new TRPCError({ code: 'UNAUTHORIZED' });
 
     const token = await createJwt(user.id);
-    return token;
+
+    return {
+      token,
+      publicUserData: user.publicData,
+    };
   });
 
 export default signInMutation;

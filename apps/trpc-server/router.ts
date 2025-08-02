@@ -1,3 +1,4 @@
+import addWallet from './mutations/add-wallet';
 import signInMutation from './mutations/sign-in';
 import signUpMutation from './mutations/sign-up';
 import validateTokenMutation from './mutations/validate-token';
@@ -8,4 +9,5 @@ export const appRouter = trpc.router({
   signUpMutation,
   signInMutation,
   validateTokenMutation,
+  addWallet,
 });

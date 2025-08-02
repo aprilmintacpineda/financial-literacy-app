@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { signInDto } from '@packages/data-transfer-objects';
+import { signInDto } from '@packages/data-transfer-objects/dtos';
 import { Link } from 'expo-router';
 import * as secureStore from 'expo-secure-store';
 import { useForm } from 'react-hook-form';
@@ -13,7 +13,7 @@ import { trpc, type tTRPCClientError } from '../../utils/trpc';
 
 export default function HomeScreen () {
   const { mutateAsync } = trpc.signInMutation.useMutation();
-  const { setToken } = useAuthContext();
+  const { login } = useAuthContext();
 
   const { control, handleSubmit } = useForm({
     resolver: zodResolver(signInDto),
@@ -26,9 +26,9 @@ export default function HomeScreen () {
 
   const onSubmit = handleSubmit(async formData => {
     try {
-      const token = await mutateAsync(formData);
+      const { token, publicUserData } = await mutateAsync(formData);
       await secureStore.setItemAsync('token', token);
-      setToken(token);
+      login(token, publicUserData, publicUserData.organizations[0]);
     } catch (_error) {
       console.log(_error);
 

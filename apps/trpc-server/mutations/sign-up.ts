@@ -1,4 +1,4 @@
-import { signUpDto } from '@packages/data-transfer-objects';
+import { signUpDto } from '@packages/data-transfer-objects/dtos';
 import { UsersRepository } from '@packages/kysely/repositories';
 import { TRPCError } from '@trpc/server';
 import { publicProcedure } from '../trpc';

@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { signUpDto } from '@packages/data-transfer-objects';
+import { signUpDto } from '@packages/data-transfer-objects/dtos';
 import { useRouter } from 'expo-router';
 import { useForm } from 'react-hook-form';
 import { Alert, Text, View } from 'react-native';

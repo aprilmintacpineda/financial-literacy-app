@@ -34,13 +34,31 @@ export default function PrivateStackRoutes () {
         }}
       />
       <Stack.Screen
+        name="edit-wallet"
+        options={{
+          presentation: 'modal',
+        }}
+      />
+      <Stack.Screen
         name="add-category"
         options={{
           presentation: 'modal',
         }}
       />
       <Stack.Screen
+        name="edit-category"
+        options={{
+          presentation: 'modal',
+        }}
+      />
+      <Stack.Screen
         name="add-tag"
+        options={{
+          presentation: 'modal',
+        }}
+      />
+      <Stack.Screen
+        name="edit-tag"
         options={{
           presentation: 'modal',
         }}

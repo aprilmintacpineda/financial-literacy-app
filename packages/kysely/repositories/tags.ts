@@ -1,27 +1,26 @@
-import { type AddTagDto } from '@packages/data-transfer-objects/dtos';
+import {
+  type AddTagDto,
+  type EditTagDto,
+} from '@packages/data-transfer-objects/dtos';
 import { createId } from '@paralleldrive/cuid2';
 import { database } from '../database';
 import { TagModel } from '../models/tag';
 
-function mapResultsToModel (
-  results: {
-    createdAt: Date;
-    description: string | null;
-    id: string;
-    name: string;
-    organizationId: string;
-    updatedAt: Date;
-  }[],
-) {
-  return results.map(result => {
-    return new TagModel({
-      id: result.id,
-      description: result.description,
-      name: result.name,
-      organizationId: result.organizationId,
-      updatedAt: result.updatedAt,
-      createdAt: result.createdAt,
-    });
+function mapResultsToModel (result: {
+  createdAt: Date;
+  description: string | null;
+  id: string;
+  name: string;
+  organizationId: string;
+  updatedAt: Date;
+}) {
+  return new TagModel({
+    id: result.id,
+    description: result.description,
+    name: result.name,
+    organizationId: result.organizationId,
+    updatedAt: result.updatedAt,
+    createdAt: result.createdAt,
   });
 }
 
@@ -58,6 +57,39 @@ export class TagsRepository {
       )
       .execute();
 
-    return mapResultsToModel(result);
+    return result.map(mapResultsToModel);
+  }
+
+  static async getTagById (id: string) {
+    const tag = await database
+      .selectFrom('tags')
+      .selectAll()
+      .where('id', '=', id)
+      .executeTakeFirst();
+
+    if (!tag) return null;
+
+    return mapResultsToModel(tag);
+  }
+
+  static async editTag (
+    organizationId: string,
+    { id, name, description }: EditTagDto,
+  ) {
+    await database
+      .updateTable('tags')
+      .set({
+        name,
+        description,
+        updatedAt: new Date(),
+      })
+      .where(eb =>
+        eb.and([
+          eb('id', '=', id),
+          eb('deletedAt', 'is', null),
+          eb('organizationId', '=', organizationId),
+        ]),
+      )
+      .execute();
   }
 }

@@ -59,6 +59,14 @@ export default function CategoriesTab () {
                     />
                   }
                   className="rounded-full p-2"
+                  href={{
+                    pathname: '/edit-category',
+                    params: {
+                      id: item.id,
+                      description: item.description,
+                      name: item.name,
+                    },
+                  }}
                 />
               </View>
               {description && <Text>{description}</Text>}

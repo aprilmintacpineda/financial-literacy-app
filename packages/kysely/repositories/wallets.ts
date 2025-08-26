@@ -1,4 +1,7 @@
-import { type AddWalletDto } from '@packages/data-transfer-objects/dtos';
+import {
+  type AddWalletDto,
+  type EditWalletDto,
+} from '@packages/data-transfer-objects/dtos';
 import {
   type CurrencyCode,
   type SupportedWalletType,
@@ -7,29 +10,25 @@ import { createId } from '@paralleldrive/cuid2';
 import { database } from '../database';
 import { WalletModel } from '../models/wallet';
 
-function mapResultsToModel (
-  results: {
-    id: string;
-    amount: number;
-    name: string;
-    organizationId: string;
-    walletType: SupportedWalletType;
-    currency: CurrencyCode;
-    updatedAt: Date;
-    createdAt: Date;
-  }[],
-) {
-  return results.map(result => {
-    return new WalletModel({
-      id: result.id,
-      amount: result.amount,
-      name: result.name,
-      organizationId: result.organizationId,
-      walletType: result.walletType,
-      currency: result.currency,
-      updatedAt: result.updatedAt,
-      createdAt: result.createdAt,
-    });
+function mapResultToModel (result: {
+  id: string;
+  amount: number;
+  name: string;
+  organizationId: string;
+  walletType: SupportedWalletType;
+  currency: CurrencyCode;
+  updatedAt: Date;
+  createdAt: Date;
+}) {
+  return new WalletModel({
+    id: result.id,
+    amount: result.amount,
+    name: result.name,
+    organizationId: result.organizationId,
+    walletType: result.walletType,
+    currency: result.currency,
+    updatedAt: result.updatedAt,
+    createdAt: result.createdAt,
   });
 }
 
@@ -70,6 +69,39 @@ export class WalletsRepository {
       )
       .execute();
 
-    return mapResultsToModel(wallets);
+    return wallets.map(mapResultToModel);
+  }
+
+  static async getWalletById (id: string) {
+    const wallet = await database
+      .selectFrom('wallets')
+      .selectAll()
+      .where(eb =>
+        eb.and([eb('id', '=', id), eb('deletedAt', 'is', null)]),
+      )
+      .executeTakeFirst();
+
+    if (!wallet) return null;
+
+    return mapResultToModel(wallet);
+  }
+
+  static async editWallet (
+    organizationId: string,
+    { id, name }: EditWalletDto,
+  ) {
+    await database
+      .updateTable('wallets')
+      .set({
+        name,
+        updatedAt: new Date(),
+      })
+      .where(eb =>
+        eb.and([
+          eb('id', '=', id),
+          eb('organizationId', '=', organizationId),
+        ]),
+      )
+      .execute();
   }
 }

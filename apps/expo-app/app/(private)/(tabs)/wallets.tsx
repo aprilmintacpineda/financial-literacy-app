@@ -62,6 +62,13 @@ export default function WalletsTab () {
                     />
                   }
                   className="rounded-full p-2"
+                  href={{
+                    pathname: '/edit-wallet',
+                    params: {
+                      id,
+                      name,
+                    },
+                  }}
                 />
               </View>
               <Text className="text-xl font-medium">

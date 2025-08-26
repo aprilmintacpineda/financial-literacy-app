@@ -57,6 +57,14 @@ export default function TagsTab () {
                     />
                   }
                   className="rounded-full p-2"
+                  href={{
+                    pathname: '/edit-tag',
+                    params: {
+                      id,
+                      name,
+                      description,
+                    },
+                  }}
                 />
               </View>
               {description && <Text>{description}</Text>}

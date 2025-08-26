@@ -6,6 +6,10 @@ import { verifyJwt } from './utils/jwt';
 export async function createTRPCContext ({
   req,
 }: CreateFastifyContextOptions) {
+  await new Promise(resolve => {
+    setTimeout(resolve, 3000);
+  });
+
   let user: UserModel | null = null;
 
   try {

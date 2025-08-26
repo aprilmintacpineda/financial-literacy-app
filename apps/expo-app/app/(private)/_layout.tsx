@@ -33,6 +33,18 @@ export default function PrivateStackRoutes () {
           presentation: 'modal',
         }}
       />
+      <Stack.Screen
+        name="add-category"
+        options={{
+          presentation: 'modal',
+        }}
+      />
+      <Stack.Screen
+        name="add-tag"
+        options={{
+          presentation: 'modal',
+        }}
+      />
     </Stack>
   );
 }

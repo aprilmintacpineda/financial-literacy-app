@@ -4,8 +4,8 @@ import bcrypt from 'bcrypt';
 import { database } from '../database';
 import { UserModel } from '../models/user';
 
-function mapResultToModel (
-  result: {
+function mapSingleUserToModel (
+  results: {
     userId: string;
     userEmail: string;
     userName: string;
@@ -18,18 +18,18 @@ function mapResultToModel (
     organizationUpdatedAt: Date;
   }[],
 ) {
-  if (!result.length) return null;
+  if (!results.length) return null;
 
   return new UserModel(
     {
-      id: result[0].userId,
-      name: result[0].userName,
-      email: result[0].userEmail,
-      password: result[0].userPassword,
-      createdAt: result[0].userCreatedAt,
-      updatedAt: result[0].userUpdatedAt,
+      id: results[0].userId,
+      name: results[0].userName,
+      email: results[0].userEmail,
+      password: results[0].userPassword,
+      createdAt: results[0].userCreatedAt,
+      updatedAt: results[0].userUpdatedAt,
     },
-    result.map(result => {
+    results.map(result => {
       return {
         id: result.organizationId,
         name: result.organizationName,
@@ -78,7 +78,7 @@ export class UsersRepository {
       )
       .execute();
 
-    return mapResultToModel(result);
+    return mapSingleUserToModel(result);
   }
 
   static async getUserById (userId: string) {
@@ -118,7 +118,7 @@ export class UsersRepository {
       )
       .execute();
 
-    return mapResultToModel(results);
+    return mapSingleUserToModel(results);
   }
 
   static async createUser ({ email, name, password }: SignUpDto) {

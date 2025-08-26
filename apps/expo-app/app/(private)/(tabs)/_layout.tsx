@@ -38,6 +38,24 @@ export default function PrivateTabRoutes () {
         }}
       />
       <Tabs.Screen
+        name="categories"
+        options={{
+          tabBarLabel: 'Categories',
+          tabBarIcon: props => (
+            <MaterialIcons name="category" {...props} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="tags"
+        options={{
+          tabBarLabel: 'Tags',
+          tabBarIcon: props => (
+            <MaterialIcons name="tag" {...props} />
+          ),
+        }}
+      />
+      <Tabs.Screen
         name="account"
         options={{
           tabBarLabel: 'Account',

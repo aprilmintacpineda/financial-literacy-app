@@ -1,66 +1,54 @@
-import { type AddWalletDto } from '@packages/data-transfer-objects/dtos';
-import {
-  type CurrencyCode,
-  type SupportedWalletType,
-} from '@packages/data-transfer-objects/enums';
+import { type AddTagDto } from '@packages/data-transfer-objects/dtos';
 import { createId } from '@paralleldrive/cuid2';
 import { database } from '../database';
-import { WalletModel } from '../models/wallet';
+import { TagModel } from '../models/tag';
 
 function mapResultsToModel (
   results: {
+    createdAt: Date;
+    description: string | null;
     id: string;
-    amount: number;
     name: string;
     organizationId: string;
-    walletType: SupportedWalletType;
-    currency: CurrencyCode;
     updatedAt: Date;
-    createdAt: Date;
   }[],
 ) {
   return results.map(result => {
-    return new WalletModel({
+    return new TagModel({
       id: result.id,
-      amount: result.amount,
+      description: result.description,
       name: result.name,
       organizationId: result.organizationId,
-      walletType: result.walletType,
-      currency: result.currency,
       updatedAt: result.updatedAt,
       createdAt: result.createdAt,
     });
   });
 }
 
-export class WalletsRepository {
-  static async createWallet ({
-    initialAmount,
+export class TagsRepository {
+  static async createTag ({
     name,
+    description,
     organizationId,
-    walletType,
-    currency,
-  }: AddWalletDto) {
+  }: AddTagDto) {
     const now = new Date();
 
     await database
-      .insertInto('wallets')
+      .insertInto('tags')
       .values({
         id: createId(),
         name,
-        amount: initialAmount,
+        description,
         organizationId,
-        walletType,
-        currency,
         createdAt: now,
         updatedAt: now,
       })
       .execute();
   }
 
-  static async getAllWallets (organizationId: string) {
-    const wallets = await database
-      .selectFrom('wallets')
+  static async getAllTags (organizationId: string) {
+    const result = await database
+      .selectFrom('tags')
       .selectAll()
       .where(eb =>
         eb.and([
@@ -70,6 +58,6 @@ export class WalletsRepository {
       )
       .execute();
 
-    return mapResultsToModel(wallets);
+    return mapResultsToModel(result);
   }
 }

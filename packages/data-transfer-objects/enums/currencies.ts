@@ -162,8 +162,11 @@ export const supportedCurrencies = [
   { code: 'ZWL', name: 'Zimbabwean Dollar' },
 ] as const;
 
-type CurrencyCode = (typeof supportedCurrencies)[number]['code'];
-type CurrencyName = (typeof supportedCurrencies)[number]['name'];
+export type CurrencyCode =
+  (typeof supportedCurrencies)[number]['code'];
+
+export type CurrencyName =
+  (typeof supportedCurrencies)[number]['name'];
 
 export const supportedCurrenciesCodes = supportedCurrencies.map(
   currency => currency.code,

@@ -5,10 +5,10 @@ import Button from '../../../components/button';
 import { useAuthContext } from '../../../contexts/auth';
 import { trpc } from '../../../utils/trpc';
 
-export default function WalletsTab () {
+export default function CategoriesTab () {
   const { activeOrganization } = useAuthContext();
   const { data, status, refetch, isRefetching } =
-    trpc.getWalletsQuery.useQuery({
+    trpc.getCategoriesQuery.useQuery({
       organizationId: activeOrganization!.id,
     });
 
@@ -18,7 +18,7 @@ export default function WalletsTab () {
         ListFooterComponent={
           status === 'success' ? (
             <View className="p-2 pb-4">
-              <Button label="Add wallet" href="/add-wallet" />
+              <Button label="Add Category" href="/add-category" />
             </View>
           ) : null
         }
@@ -26,7 +26,7 @@ export default function WalletsTab () {
           status === 'success' ? (
             <View className="flex-1 items-center justify-center p-5">
               <Text className="text-center">
-                You have no wallets
+                You have no categories
               </Text>
             </View>
           ) : null
@@ -39,7 +39,7 @@ export default function WalletsTab () {
         }
         data={data || []}
         renderItem={({ item }) => {
-          const { amount, name, currency, walletType, id } = item;
+          const { id, name, description } = item;
 
           return (
             <View
@@ -49,9 +49,6 @@ export default function WalletsTab () {
               <View className="flex-row items-center justify-between">
                 <View className="flex-row items-center gap-2">
                   <Text className="text-xl">{name}</Text>
-                  <Text className="text-sm text-disabled-text">
-                    {walletType}
-                  </Text>
                 </View>
                 <Button
                   icon={
@@ -64,12 +61,7 @@ export default function WalletsTab () {
                   className="rounded-full p-2"
                 />
               </View>
-              <Text className="text-xl font-medium">
-                {new Intl.NumberFormat(undefined, {
-                  currency: currency,
-                  style: 'currency',
-                }).format(amount)}
-              </Text>
+              {description && <Text>{description}</Text>}
             </View>
           );
         }}

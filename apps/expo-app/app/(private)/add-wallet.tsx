@@ -51,7 +51,7 @@ export default function AddWallet () {
     mode: 'all',
   });
 
-  const { mutateAsync } = trpc.addWallet.useMutation();
+  const { mutateAsync } = trpc.addWalletMutation.useMutation();
 
   const onSubmit = handleSubmit(async data => {
     try {

@@ -37,7 +37,10 @@ export default function AccountTab () {
           activeOrganization?.id === organization.id;
 
         return (
-          <View className="border-b border-b-borders">
+          <View
+            className="border-b border-b-borders"
+            key={organization.id}
+          >
             <TouchableOpacity>
               <View
                 className={twMerge(

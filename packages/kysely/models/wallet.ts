@@ -9,6 +9,10 @@ export class WalletModel implements Omit<Wallets, 'deletedAt'> {
     };
   }
 
+  get publicData () {
+    return this.data;
+  }
+
   get id () {
     return this.data.id;
   }

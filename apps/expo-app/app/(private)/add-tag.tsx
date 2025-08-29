@@ -13,7 +13,7 @@ import { alertMessage, alertUknownError } from '../../utils/alerts';
 import { trpc } from '../../utils/trpc';
 
 export default function AddTag () {
-  const { activeOrganization } = useAuthContext();
+  const { activeOrganization } = useAuthContext(true);
   const router = useRouter();
 
   const { control, handleSubmit } = useForm({
@@ -21,7 +21,7 @@ export default function AddTag () {
     values: {
       name: '',
       description: '',
-      organizationId: activeOrganization!.id,
+      organizationId: activeOrganization.id,
     } satisfies AddTagDto,
     mode: 'all',
   });

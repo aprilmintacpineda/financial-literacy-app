@@ -6,10 +6,10 @@ import { useAuthContext } from '../../../contexts/auth';
 import { trpc } from '../../../utils/trpc';
 
 export default function CategoriesTab () {
-  const { activeOrganization } = useAuthContext();
+  const { activeOrganization } = useAuthContext(true);
   const { data, status, refetch, isRefetching } =
     trpc.getCategoriesQuery.useQuery({
-      organizationId: activeOrganization!.id,
+      organizationId: activeOrganization.id,
     });
 
   return (

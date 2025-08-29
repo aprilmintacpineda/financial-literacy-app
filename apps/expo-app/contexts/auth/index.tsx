@@ -13,13 +13,16 @@ interface iState {
   token?: string;
   publicUserData?: PublicUserData;
   activeOrganization?: PublicUserData['organizations'][number];
+  isLoggedIn: boolean;
 }
 
 type tAuthContext = iState & {
   setToken: (token: string) => void;
   setUserData: (
-    publicUserData: PublicUserData,
-    activeOrganization: PublicUserData['organizations'][number]
+    resolver: (state: iState) => {
+      publicUserData: PublicUserData;
+      activeOrganization: PublicUserData['organizations'][number];
+    }
   ) => void;
   clearAuth: () => void;
   login: (
@@ -36,6 +39,7 @@ export function AuthContextProvider ({
 }: PropsWithChildren) {
   const [state, setState] = useState<iState>({
     status: 'initial',
+    isLoggedIn: false,
   });
 
   const setToken = useCallback((token: string) => {
@@ -60,6 +64,7 @@ export function AuthContextProvider ({
           publicUserData,
           activeOrganization,
           status: 'done',
+          isLoggedIn: true,
         };
       });
     },
@@ -68,10 +73,15 @@ export function AuthContextProvider ({
 
   const setUserData = useCallback(
     (
-      publicUserData: PublicUserData,
-      activeOrganization: PublicUserData['organizations'][number],
+      resolver: (state: iState) => {
+        publicUserData: PublicUserData;
+        activeOrganization: PublicUserData['organizations'][number];
+      },
     ) => {
       setState(oldState => {
+        const { publicUserData, activeOrganization } =
+          resolver(oldState);
+
         return {
           ...oldState,
           status: 'done',
@@ -90,6 +100,7 @@ export function AuthContextProvider ({
         status: 'done',
         publicUserData: undefined,
         token: undefined,
+        isLoggedIn: false,
       };
     });
   }, []);
@@ -111,6 +122,21 @@ export function AuthContextProvider ({
   );
 }
 
-export function useAuthContext () {
-  return useContext(AuthContext);
+export function useAuthContext(): tAuthContext;
+export function useAuthContext(
+  requireLoggedIn: true
+): Required<tAuthContext>;
+
+export function useAuthContext (requireLoggedIn = false) {
+  const context = useContext(AuthContext);
+
+  if (
+    requireLoggedIn &&
+    (!context.publicUserData ||
+      !context.activeOrganization ||
+      !context.token)
+  )
+    throw new Error('User is not logged in');
+
+  return context;
 }

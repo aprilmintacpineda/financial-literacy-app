@@ -36,7 +36,7 @@ const walletTypeOptions = [
 ];
 
 export default function AddWallet () {
-  const { activeOrganization } = useAuthContext();
+  const { activeOrganization } = useAuthContext(true);
   const router = useRouter();
 
   const { control, handleSubmit } = useForm({
@@ -44,7 +44,7 @@ export default function AddWallet () {
     values: {
       name: '',
       initialAmount: 0,
-      organizationId: activeOrganization!.id,
+      organizationId: activeOrganization.id,
       currency: 'PHP',
       walletType: 'Debit',
     } satisfies AddWalletDto,

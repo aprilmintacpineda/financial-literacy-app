@@ -6,10 +6,10 @@ import { useAuthContext } from '../../../contexts/auth';
 import { trpc } from '../../../utils/trpc';
 
 export default function WalletsTab () {
-  const { activeOrganization } = useAuthContext();
+  const { activeOrganization } = useAuthContext(true);
   const { data, status, refetch, isRefetching } =
     trpc.getWalletsQuery.useQuery({
-      organizationId: activeOrganization!.id,
+      organizationId: activeOrganization.id,
     });
 
   return (

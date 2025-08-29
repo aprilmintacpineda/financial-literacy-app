@@ -8,7 +8,8 @@ import { useThemeColors } from '../../../themes';
 
 export default function AccountTab () {
   const themeColors = useThemeColors();
-  const { publicUserData, activeOrganization } = useAuthContext();
+  const { publicUserData, activeOrganization } =
+    useAuthContext(true);
 
   return (
     <SafeAreaView>
@@ -32,9 +33,9 @@ export default function AccountTab () {
       <View className="bg-disabled-border p-2">
         <Text className="font-bold">Teams</Text>
       </View>
-      {publicUserData!.organizations.map(organization => {
+      {publicUserData.organizations.map(organization => {
         const isActiveOrg =
-          activeOrganization?.id === organization.id;
+          activeOrganization.id === organization.id;
 
         return (
           <View

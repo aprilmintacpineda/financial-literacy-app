@@ -6,17 +6,23 @@ import {
 } from 'react-hook-form';
 import Button from '../button';
 
-type FormSubmitButtonProps<T extends FieldValues> = Omit<
-  ComponentProps<typeof Button>,
-  'isDisabled'
+type FormSubmitButtonProps<T extends FieldValues> = ComponentProps<
+  typeof Button
 > & {
   control: Control<T>;
 };
 
 export default function FormSubmitButton<T extends FieldValues> ({
   control,
+  isDisabled,
   ...buttonProps
 }: FormSubmitButtonProps<T>) {
   const { isSubmitting } = useFormState({ control });
-  return <Button isDisabled={isSubmitting} {...buttonProps} />;
+
+  return (
+    <Button
+      isDisabled={isSubmitting || isDisabled}
+      {...buttonProps}
+    />
+  );
 }

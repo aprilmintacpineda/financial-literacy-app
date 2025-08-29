@@ -1,9 +1,9 @@
 import { editCategoryDto } from '@packages/data-transfer-objects/dtos';
 import { TagsRepository } from '@packages/kysely/repositories';
 import { TRPCError } from '@trpc/server';
-import { protectedProcedure } from '../trpc';
+import { verifiedUserProcedure } from '../trpc';
 
-const editTagMutation = protectedProcedure
+const editTagMutation = verifiedUserProcedure
   .input(editCategoryDto)
   .mutation(async ({ ctx, input }) => {
     const tag = await TagsRepository.getTagById(input.id);

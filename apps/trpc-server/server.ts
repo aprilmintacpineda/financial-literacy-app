@@ -9,10 +9,10 @@ import { createTRPCContext } from './context';
 import { appRouter } from './router';
 import { type tAppRouter } from './types/trpc';
 
-async function main () {
+async function main() {
   const server = fastify();
 
-  server.get('/', async function handler () {
+  server.get('/', async function handler() {
     return { hello: 'world' };
   });
 
@@ -21,11 +21,11 @@ async function main () {
     trpcOptions: {
       router: appRouter,
       createContext: createTRPCContext,
-      onError ({ path, error }) {
+      onError({ path, error }) {
         // @todo report errors to sentry
         console.error(
           `Error in tRPC handler on path '${path}':`,
-          error,
+          error
         );
       },
     } satisfies FastifyTRPCPluginOptions<tAppRouter>['trpcOptions'],

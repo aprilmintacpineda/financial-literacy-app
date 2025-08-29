@@ -1,13 +1,13 @@
 import { editCategoryDto } from '@packages/data-transfer-objects/dtos';
 import { CategoriesRepository } from '@packages/kysely/repositories';
 import { TRPCError } from '@trpc/server';
-import { protectedProcedure } from '../trpc';
+import { verifiedUserProcedure } from '../trpc';
 
-const editCategoryMutation = protectedProcedure
+const editCategoryMutation = verifiedUserProcedure
   .input(editCategoryDto)
   .mutation(async ({ ctx, input }) => {
     const category = await CategoriesRepository.getCategoryById(
-      input.id,
+      input.id
     );
 
     if (
@@ -18,7 +18,7 @@ const editCategoryMutation = protectedProcedure
 
     await CategoriesRepository.editCategory(
       category.organizationId,
-      input,
+      input
     );
   });
 

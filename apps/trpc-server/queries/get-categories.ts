@@ -1,13 +1,13 @@
 import { CategoriesRepository } from '@packages/kysely/repositories';
 import { TRPCError } from '@trpc/server';
 import z from 'zod';
-import { protectedProcedure } from '../trpc';
+import { verifiedUserProcedure } from '../trpc';
 
-const getCategoriesQuery = protectedProcedure
+const getCategoriesQuery = verifiedUserProcedure
   .input(
     z.object({
       organizationId: z.string(),
-    }),
+    })
   )
   .query(async ({ input: { organizationId }, ctx }) => {
     if (!ctx.user.isPartOfOrganization(organizationId))

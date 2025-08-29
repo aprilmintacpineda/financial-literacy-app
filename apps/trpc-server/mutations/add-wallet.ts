@@ -1,9 +1,9 @@
 import { addWalletDto } from '@packages/data-transfer-objects/dtos';
 import { WalletsRepository } from '@packages/kysely/repositories';
 import { TRPCError } from '@trpc/server';
-import { protectedProcedure } from '../trpc';
+import { verifiedUserProcedure } from '../trpc';
 
-const addWalletMutation = protectedProcedure
+const addWalletMutation = verifiedUserProcedure
   .input(addWalletDto)
   .mutation(async ({ ctx, input }) => {
     if (!ctx.user.isPartOfOrganization(input.organizationId))

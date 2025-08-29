@@ -1,9 +1,9 @@
 import { editWalletDto } from '@packages/data-transfer-objects/dtos';
 import { WalletsRepository } from '@packages/kysely/repositories';
 import { TRPCError } from '@trpc/server';
-import { protectedProcedure } from '../trpc';
+import { verifiedUserProcedure } from '../trpc';
 
-const editWalletMutation = protectedProcedure
+const editWalletMutation = verifiedUserProcedure
   .input(editWalletDto)
   .mutation(async ({ ctx, input }) => {
     const wallet = await WalletsRepository.getWalletById(input.id);

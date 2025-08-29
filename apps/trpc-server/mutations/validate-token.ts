@@ -1,7 +1,15 @@
-import { protectedProcedure } from '../trpc';
+import { verifiedUserProcedure } from '../trpc';
+import { createJwt } from '../utils/jwt';
 
-const validateTokenMutation = protectedProcedure.mutation(
-  async ({ ctx }) => ctx.user.publicData,
+const validateTokenMutation = verifiedUserProcedure.mutation(
+  async ({ ctx }) => {
+    const token = await createJwt(ctx.user.id);
+
+    return {
+      token,
+      publicUserData: ctx.user.publicData,
+    };
+  }
 );
 
 export default validateTokenMutation;

@@ -1,13 +1,13 @@
 import { WalletsRepository } from '@packages/kysely/repositories';
 import { TRPCError } from '@trpc/server';
 import z from 'zod';
-import { protectedProcedure } from '../trpc';
+import { verifiedUserProcedure } from '../trpc';
 
-const getWalletsQuery = protectedProcedure
+const getWalletsQuery = verifiedUserProcedure
   .input(
     z.object({
       organizationId: z.string(),
-    }),
+    })
   )
   .query(async ({ input: { organizationId }, ctx }) => {
     if (!ctx.user.isPartOfOrganization(organizationId))

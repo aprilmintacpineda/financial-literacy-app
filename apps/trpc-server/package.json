@@ -18,6 +18,7 @@
   },
   "license": "UNLICENSED",
   "dependencies": {
+    "@aws-sdk/client-sesv2": "^3.876.0",
     "@packages/data-transfer-objects": "workspace:*",
     "@packages/kysely": "workspace:*",
     "@paralleldrive/cuid2": "^2.2.2",

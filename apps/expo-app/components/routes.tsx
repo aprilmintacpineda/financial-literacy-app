@@ -6,7 +6,7 @@ import { trpc } from '../utils/trpc';
 
 export default function Routes () {
   const { mutateAsync } = trpc.validateTokenMutation.useMutation();
-  const { status, token, clearAuth, setUserData, setToken } =
+  const { status, token, clearAuth, login, setToken, isLoggedIn } =
     useAuthContext();
 
   useEffect(() => {
@@ -14,8 +14,14 @@ export default function Routes () {
 
     async function validateToken () {
       try {
-        const publicUserData = await mutateAsync();
-        setUserData(publicUserData, publicUserData.organizations[0]);
+        const { publicUserData, token } = await mutateAsync();
+        await secureStore.setItemAsync('token', token);
+
+        login(
+          token,
+          publicUserData,
+          publicUserData.organizations[0],
+        );
       } catch (_error) {
         // @todo maybe log in sentry?
         console.log(_error);
@@ -37,8 +43,6 @@ export default function Routes () {
 
   if (status !== 'done') return null;
 
-  const isLoggedIn = Boolean(token);
-
   return (
     <Stack>
       <Stack.Protected guard={isLoggedIn}>
@@ -51,16 +55,14 @@ export default function Routes () {
           }}
         />
       </Stack.Protected>
-      <Stack.Protected guard={!isLoggedIn}>
-        <Stack.Screen
-          name="(public)"
-          options={{
-            headerShown: false,
-            gestureEnabled: false,
-            animation: 'fade_from_bottom',
-          }}
-        />
-      </Stack.Protected>
+      <Stack.Screen
+        name="(public)"
+        options={{
+          headerShown: false,
+          gestureEnabled: false,
+          animation: 'fade_from_bottom',
+        }}
+      />
     </Stack>
   );
 }

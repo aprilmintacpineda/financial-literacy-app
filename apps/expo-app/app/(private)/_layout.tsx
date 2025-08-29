@@ -22,6 +22,12 @@ export default function PrivateStackRoutes () {
         }}
       />
       <Stack.Screen
+        name="verify-email"
+        options={{
+          title: 'Verify Email',
+        }}
+      />
+      <Stack.Screen
         name="change-account-details"
         options={{
           title: 'Change Account Details',

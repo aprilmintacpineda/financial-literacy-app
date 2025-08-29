@@ -18,6 +18,7 @@ type FormTextInputProps<T extends FieldValues> = Omit<
 export default function FormTextInput<T extends FieldValues> ({
   control,
   name,
+  isDisabled,
   ...textInputProps
 }: FormTextInputProps<T>) {
   const { field, fieldState, formState } = useController({
@@ -31,7 +32,7 @@ export default function FormTextInput<T extends FieldValues> ({
       errorMessage={fieldState.error?.message}
       value={field.value}
       onChangeText={field.onChange}
-      isDisabled={formState.isSubmitting}
+      isDisabled={formState.isSubmitting || isDisabled}
     />
   );
 }

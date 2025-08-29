@@ -2,10 +2,10 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { signUpDto } from '@packages/data-transfer-objects/dtos';
 import { useRouter } from 'expo-router';
 import { useForm } from 'react-hook-form';
-import { Alert, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 import FormSubmitButton from '../../components/forms/submit-button';
 import FormTextInput from '../../components/forms/text-input';
-import { alertUknownError } from '../../utils/alerts';
+import { alertMessage, alertUknownError } from '../../utils/alerts';
 import { trpc, type tTRPCClientError } from '../../utils/trpc';
 
 export default function HomeScreen () {
@@ -28,7 +28,7 @@ export default function HomeScreen () {
       await mutateAsync(form);
       router.navigate('/(public)');
 
-      Alert.alert(
+      alertMessage(
         'Success 🚀',
         'You can now login using your account',
       );
@@ -39,7 +39,7 @@ export default function HomeScreen () {
       const error = _error as tTRPCClientError;
 
       if (error.data?.code === 'CONFLICT')
-        Alert.alert('', 'That email is already in use.');
+        alertMessage('That email is already in use.');
       else alertUknownError();
     }
   });

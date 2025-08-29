@@ -11,10 +11,11 @@ import { twMerge } from 'tailwind-merge';
 interface iProps {
   isDisabled?: boolean;
   onPress?: () => void;
-  label?: string;
+  label?: string | ReactNode;
   href?: ComponentProps<typeof Link>['href'];
   icon?: ReactNode;
   className?: ComponentProps<typeof Pressable>['className'];
+  variant?: 'solid' | 'outline';
 }
 
 export default function Button ({
@@ -24,6 +25,7 @@ export default function Button ({
   href,
   icon,
   className,
+  variant = 'solid',
 }: iProps) {
   const router = useRouter();
   const [isPressed, setIsPressed] = useState(false);
@@ -43,22 +45,32 @@ export default function Button ({
       onPressIn={togglePressed}
       onPressOut={togglePressed}
       className={twMerge(
-        'flex-row items-center justify-center gap-2 rounded-lg border border-primary bg-primary p-4',
-        isPressed && 'border-tertiary bg-tertiary',
-        isDisabled && 'border border-disabled-border bg-disabled-bg',
+        'flex-row items-center justify-center gap-2 rounded-lg border border-primary p-4',
+        isPressed && 'opacity-50',
+        isDisabled
+          ? 'border-disabled-border bg-disabled-bg'
+          : variant === 'solid'
+            ? 'bg-primary'
+            : '',
         className,
       )}
       disabled={isDisabled}
     >
-      {label && (
+      {typeof label === 'string' ? (
         <Text
           className={twMerge(
-            'text-center font-bold text-primary-contrast-text',
-            isDisabled && 'text-disabled-text',
+            'text-center font-bold',
+            isDisabled
+              ? 'text-disabled-text'
+              : variant === 'solid'
+                ? 'text-primary-contrast-text'
+                : 'text-primary',
           )}
         >
           {label}
         </Text>
+      ) : (
+        label
       )}
       {icon}
     </Pressable>

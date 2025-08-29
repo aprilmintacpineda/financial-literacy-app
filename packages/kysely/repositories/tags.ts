@@ -4,16 +4,10 @@ import {
 } from '@packages/data-transfer-objects/dtos';
 import { createId } from '@paralleldrive/cuid2';
 import { database } from '../database';
-import { TagModel } from '../models/tag';
+import { type Tags } from '../database-types';
+import { TagModel } from '../models';
 
-function mapResultsToModel (result: {
-  createdAt: Date;
-  description: string | null;
-  id: string;
-  name: string;
-  organizationId: string;
-  updatedAt: Date;
-}) {
+function mapResultsToModel (result: Omit<Tags, 'deletedAt'>) {
   return new TagModel({
     id: result.id,
     description: result.description,

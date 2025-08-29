@@ -4,16 +4,10 @@ import {
 } from '@packages/data-transfer-objects/dtos';
 import { createId } from '@paralleldrive/cuid2';
 import { database } from '../database';
-import { CategoryModel } from '../models/category';
+import { type Categories } from '../database-types';
+import { CategoryModel } from '../models';
 
-function mapResultsToModel (result: {
-  createdAt: Date;
-  description: string | null;
-  id: string;
-  name: string;
-  organizationId: string;
-  updatedAt: Date;
-}) {
+function mapResultsToModel (result: Omit<Categories, 'deletedAt'>) {
   return new CategoryModel({
     id: result.id,
     description: result.description,

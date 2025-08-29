@@ -8,6 +8,7 @@ export const database = new Kysely<DB>({
     pool: createPool({
       uri: env.DATABASE_URL,
       connectionLimit: 10,
+      timezone: 'Z',
     }),
   }),
   log:

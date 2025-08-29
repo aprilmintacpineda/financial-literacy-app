@@ -13,7 +13,7 @@ export async function up (db: Kysely<any>): Promise<void> {
     .addColumn('originalAmount', 'bigint', col => col.notNull())
     .addColumn('transferedAmount', 'bigint', col => col.notNull())
     .addColumn('exchangeRate', 'bigint', col => col.notNull())
-    .addColumn('transferDate', 'date', col => col.notNull())
+    .addColumn('transferDate', 'timestamp', col => col.notNull())
     .execute();
 
   await db.schema

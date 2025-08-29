@@ -1,19 +1,20 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { signInDto } from '@packages/data-transfer-objects/dtos';
-import { Link } from 'expo-router';
+import { Link, Redirect, useRouter } from 'expo-router';
 import * as secureStore from 'expo-secure-store';
 import { useForm } from 'react-hook-form';
-import { Alert, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import FormSubmitButton from '../../components/forms/submit-button';
 import FormTextInput from '../../components/forms/text-input';
 import { useAuthContext } from '../../contexts/auth';
-import { alertUknownError } from '../../utils/alerts';
+import { alertMessage, alertUknownError } from '../../utils/alerts';
 import { trpc, type tTRPCClientError } from '../../utils/trpc';
 
 export default function HomeScreen () {
   const { mutateAsync } = trpc.signInMutation.useMutation();
-  const { login } = useAuthContext();
+  const { login, isLoggedIn } = useAuthContext();
+  const router = useRouter();
 
   const { control, handleSubmit } = useForm({
     resolver: zodResolver(signInDto),
@@ -29,16 +30,23 @@ export default function HomeScreen () {
       const { token, publicUserData } = await mutateAsync(formData);
       await secureStore.setItemAsync('token', token);
       login(token, publicUserData, publicUserData.organizations[0]);
+
+      if (publicUserData.isEmailVerified)
+        router.replace('/(private)/(tabs)/transactions');
+      else router.replace('/(private)/verify-email');
     } catch (_error) {
       console.log(_error);
 
       const error = _error as tTRPCClientError;
 
       if (error.data?.code === 'UNAUTHORIZED')
-        Alert.alert('', 'Incorrect email/password.');
+        alertMessage('Incorrect email/password.');
       else alertUknownError();
     }
   });
+
+  if (isLoggedIn)
+    return <Redirect href="/(private)/(tabs)/transactions" />;
 
   return (
     <View className="flex-1 bg-primary">

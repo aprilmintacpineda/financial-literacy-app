@@ -1,5 +1,6 @@
 import bcrypt from 'bcrypt';
 import { type Organizations, type Users } from '../database-types';
+import { omit } from '../utils/data-manipulation';
 import { OrganizationModel } from './organization';
 
 export class UserModel implements Omit<Users, 'deletedAt'> {
@@ -30,16 +31,20 @@ export class UserModel implements Omit<Users, 'deletedAt'> {
   }
 
   get publicData () {
-    const {
-      // extract out password
-      password, // eslint-disable-line
-      organizations,
-      ...publicData
-    } = this.data;
+    const publicData = omit(this.data, [
+      'password',
+      'organizations',
+      'emailVerifiedAt',
+      'emailVerificationCode',
+      'emailVerificationCodeExpiresAt',
+      'emailVerificationCodeTries',
+      'updatedAt',
+    ]);
 
     return {
       ...publicData,
-      organizations: organizations.map(
+      isEmailVerified: Boolean(this.emailVerifiedAt),
+      organizations: this.organizations.map(
         organization => organization.publicData,
       ),
     };
@@ -47,6 +52,26 @@ export class UserModel implements Omit<Users, 'deletedAt'> {
 
   get id () {
     return this.data.id;
+  }
+
+  get emailVerificationCodeCanSentAt () {
+    return this.data.emailVerificationCodeCanSentAt;
+  }
+
+  get emailVerificationCode () {
+    return this.data.emailVerificationCode;
+  }
+
+  get emailVerificationCodeExpiresAt () {
+    return this.data.emailVerificationCodeExpiresAt;
+  }
+
+  get emailVerificationCodeTries () {
+    return this.data.emailVerificationCodeTries;
+  }
+
+  get emailVerifiedAt () {
+    return this.data.emailVerifiedAt;
   }
 
   get email () {

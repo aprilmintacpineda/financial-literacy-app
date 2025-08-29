@@ -24,6 +24,7 @@ function toIntersection (values: readonly string[]) {
         'wallets.currency': currency,
         'transactions.currency': currency,
         'transactions.transactionType': transactionTypes,
+        'users.emailVerificationCodeTries': 'number',
       },
     },
   };

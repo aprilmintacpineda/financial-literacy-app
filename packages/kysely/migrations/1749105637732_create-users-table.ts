@@ -1,4 +1,4 @@
-import type { Kysely } from 'kysely';
+import { sql, type Kysely } from 'kysely';
 import { createBaseTable } from '../utils/schema';
 import { cuid, names } from '../utils/types';
 
@@ -11,6 +11,19 @@ export async function up (db: Kysely<any>): Promise<void> {
     )
     .addColumn('password', 'varchar(255)', col => col.notNull())
     .addColumn('name', names, col => col.notNull())
+    .addColumn('emailVerificationCode', 'varchar(9)', col =>
+      col.notNull(),
+    )
+    .addColumn('emailVerificationCodeExpiresAt', 'timestamp', col =>
+      col.notNull(),
+    )
+    .addColumn('emailVerificationCodeCanSentAt', 'timestamp', col =>
+      col.notNull(),
+    )
+    .addColumn('emailVerifiedAt', 'timestamp')
+    .addColumn('emailVerificationCodeTries', sql`tinyint`, col =>
+      col.notNull().defaultTo(0),
+    )
     .execute();
 }
 

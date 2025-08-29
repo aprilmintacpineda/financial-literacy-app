@@ -2,20 +2,34 @@ import { type SignUpDto } from '@packages/data-transfer-objects/dtos';
 import { createId } from '@paralleldrive/cuid2';
 import bcrypt from 'bcrypt';
 import { database } from '../database';
-import { UserModel } from '../models/user';
+import {
+  type Organizations,
+  type OrganizationUsers,
+  type Users,
+} from '../database-types';
+import { UserModel } from '../models';
+import {
+  getEmailVerificationCodeCanSentAt,
+  getEmailVerificationCodeExpiresAt,
+} from '../utils/time';
 
 function mapSingleUserToModel (
   results: {
-    userId: string;
-    userEmail: string;
-    userName: string;
-    userPassword: string;
-    userCreatedAt: Date;
-    userUpdatedAt: Date;
-    organizationId: string;
-    organizationName: string;
-    organizationCreatedAt: Date;
-    organizationUpdatedAt: Date;
+    userId: Users['id'];
+    userEmail: Users['email'];
+    userName: Users['name'];
+    userPassword: Users['password'];
+    userCreatedAt: Users['createdAt'];
+    userUpdatedAt: Users['updatedAt'];
+    userEmailVerificationCode: Users['emailVerificationCode'];
+    userEmailVerificationCodeExpiresAt: Users['emailVerificationCodeExpiresAt'];
+    userEmailVerificationCodeTries: Users['emailVerificationCodeTries'];
+    userEmailVerifiedAt: Users['emailVerifiedAt'];
+    userEmailVerificationCodeCanSentAt: Users['emailVerificationCodeCanSentAt'];
+    organizationId: OrganizationUsers['organizationId'];
+    organizationName: Organizations['name'];
+    organizationCreatedAt: Organizations['createdAt'];
+    organizationUpdatedAt: Organizations['updatedAt'];
   }[],
 ) {
   if (!results.length) return null;
@@ -28,6 +42,14 @@ function mapSingleUserToModel (
       password: results[0].userPassword,
       createdAt: results[0].userCreatedAt,
       updatedAt: results[0].userUpdatedAt,
+      emailVerificationCode: results[0].userEmailVerificationCode,
+      emailVerificationCodeExpiresAt:
+        results[0].userEmailVerificationCodeExpiresAt,
+      emailVerificationCodeTries:
+        results[0].userEmailVerificationCodeTries,
+      emailVerifiedAt: results[0].userEmailVerifiedAt,
+      emailVerificationCodeCanSentAt:
+        results[0].userEmailVerificationCodeCanSentAt,
     },
     results.map(result => {
       return {
@@ -65,6 +87,11 @@ export class UsersRepository {
         'users.password as userPassword',
         'users.createdAt as userCreatedAt',
         'users.updatedAt as userUpdatedAt',
+        'users.emailVerificationCode as userEmailVerificationCode',
+        'users.emailVerificationCodeExpiresAt as userEmailVerificationCodeExpiresAt',
+        'users.emailVerificationCodeTries as userEmailVerificationCodeTries',
+        'users.emailVerifiedAt as userEmailVerifiedAt',
+        'users.emailVerificationCodeCanSentAt as userEmailVerificationCodeCanSentAt',
         'organizations.id as organizationId',
         'organizations.name as organizationName',
         'organizations.createdAt as organizationCreatedAt',
@@ -105,6 +132,11 @@ export class UsersRepository {
         'users.password as userPassword',
         'users.createdAt as userCreatedAt',
         'users.updatedAt as userUpdatedAt',
+        'users.emailVerificationCode as userEmailVerificationCode',
+        'users.emailVerificationCodeExpiresAt as userEmailVerificationCodeExpiresAt',
+        'users.emailVerificationCodeTries as userEmailVerificationCodeTries',
+        'users.emailVerifiedAt as userEmailVerifiedAt',
+        'users.emailVerificationCodeCanSentAt as userEmailVerificationCodeCanSentAt',
         'organizations.id as organizationId',
         'organizations.name as organizationName',
         'organizations.createdAt as organizationCreatedAt',
@@ -121,7 +153,12 @@ export class UsersRepository {
     return mapSingleUserToModel(results);
   }
 
-  static async createUser ({ email, name, password }: SignUpDto) {
+  static async createUser ({
+    email,
+    name,
+    password,
+    emailVerificationCode,
+  }: SignUpDto & { emailVerificationCode: string }) {
     await database.transaction().execute(async trx => {
       const hashedPassword = await bcrypt.hash(password, 12);
       const now = new Date();
@@ -135,6 +172,12 @@ export class UsersRepository {
           email,
           password: hashedPassword,
           name,
+          emailVerificationCode,
+          emailVerificationCodeExpiresAt:
+            getEmailVerificationCodeExpiresAt(),
+          emailVerificationCodeTries: 0,
+          emailVerificationCodeCanSentAt:
+            getEmailVerificationCodeCanSentAt(),
           updatedAt: now,
           createdAt: now,
         })
@@ -160,5 +203,34 @@ export class UsersRepository {
         })
         .execute();
     });
+  }
+
+  static async updateUser ({
+    id,
+    ...input
+  }: Pick<Users, 'id'> &
+    Partial<
+      Pick<
+        Users,
+        | 'id'
+        | 'password'
+        | 'name'
+        | 'emailVerificationCode'
+        | 'emailVerificationCodeExpiresAt'
+        | 'emailVerificationCodeTries'
+        | 'emailVerificationCodeCanSentAt'
+        | 'emailVerifiedAt'
+      >
+    >) {
+    await database
+      .updateTable('users')
+      .set({
+        ...input,
+        updatedAt: new Date(),
+      })
+      .where(eb =>
+        eb.and([eb('id', '=', id), eb('deletedAt', 'is', null)]),
+      )
+      .execute();
   }
 }

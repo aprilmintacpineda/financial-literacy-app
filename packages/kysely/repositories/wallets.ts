@@ -2,24 +2,12 @@ import {
   type AddWalletDto,
   type EditWalletDto,
 } from '@packages/data-transfer-objects/dtos';
-import {
-  type CurrencyCode,
-  type SupportedWalletType,
-} from '@packages/data-transfer-objects/enums';
 import { createId } from '@paralleldrive/cuid2';
 import { database } from '../database';
-import { WalletModel } from '../models/wallet';
+import { type Wallets } from '../database-types';
+import { WalletModel } from '../models';
 
-function mapResultToModel (result: {
-  id: string;
-  amount: number;
-  name: string;
-  organizationId: string;
-  walletType: SupportedWalletType;
-  currency: CurrencyCode;
-  updatedAt: Date;
-  createdAt: Date;
-}) {
+function mapResultToModel (result: Omit<Wallets, 'deletedAt'>) {
   return new WalletModel({
     id: result.id,
     amount: result.amount,

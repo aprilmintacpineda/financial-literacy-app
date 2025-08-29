@@ -17,6 +17,12 @@ importers:
       '@hookform/resolvers':
         specifier: ^5.1.1
         version: 5.1.1(react-hook-form@7.60.0(react@19.0.0))
+      '@js-joda/core':
+        specifier: ^5.6.5
+        version: 5.6.5
+      '@js-joda/timezone':
+        specifier: ^2.22.0
+        version: 2.22.0(@js-joda/core@5.6.5)
       '@packages/data-transfer-objects':
         specifier: workspace:*
         version: link:../../packages/data-transfer-objects
@@ -909,6 +915,14 @@ packages:
 
   '@jridgewell/trace-mapping@0.3.29':
     resolution: {integrity: sha512-uw6guiW/gcAGPDhLmd77/6lW8QLeiV5RUTsAX46Db6oLhGaVj4lhnPwb184s1bkc8kdVg/+h988dro8GRDpmYQ==}
+
+  '@js-joda/core@5.6.5':
+    resolution: {integrity: sha512-3zwefSMwHpu8iVUW8YYz227sIv6UFqO31p1Bf1ZH/Vom7CmNyUsXjDBlnNzcuhmOL1XfxZ3nvND42kR23XlbcQ==}
+
+  '@js-joda/timezone@2.22.0':
+    resolution: {integrity: sha512-9UNXxEztbcofD6XvV7xPrbzB2nE/AWaHr/XfugRZgVqg2vCZOVPnD8QI7GW164EFIWMw0c97Gs6STJ5dh0J99Q==}
+    peerDependencies:
+      '@js-joda/core': '>=1.11.0'
 
   '@napi-rs/wasm-runtime@0.2.11':
     resolution: {integrity: sha512-9DPkXtvHydrcOsopiYpUgPHpmj0HWZKMUnL2dZqpvC42lsratuBG06V5ipyno0fUek5VlFsNQ+AcFATSrJXgMA==}
@@ -5612,6 +5626,12 @@ snapshots:
     dependencies:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.4
+
+  '@js-joda/core@5.6.5': {}
+
+  '@js-joda/timezone@2.22.0(@js-joda/core@5.6.5)':
+    dependencies:
+      '@js-joda/core': 5.6.5
 
   '@napi-rs/wasm-runtime@0.2.11':
     dependencies:

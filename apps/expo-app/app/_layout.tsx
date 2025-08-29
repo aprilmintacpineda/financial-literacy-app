@@ -1,3 +1,4 @@
+import '@js-joda/timezone';
 import 'react-native-reanimated';
 import '../global.css';
 

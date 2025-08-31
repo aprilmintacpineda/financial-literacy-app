@@ -39,10 +39,10 @@ export default function VerifyEmail () {
 
       if (error.data?.code === 'BAD_REQUEST') {
         alertMessage('Incorrect code');
-      } else if (error.data?.code === 'CONFLICT') {
-        alertMessage(
-          'Your verification code has expired or you have reached the maximum attempts.',
-        );
+      } else if (error.data?.code === 'UNPROCESSABLE_CONTENT') {
+        alertMessage('Your verification code has expired.');
+      } else if (error.data?.code === 'TOO_MANY_REQUESTS') {
+        alertMessage('You have reached the maximum attempts.');
       } else {
         // @todo log to sentry?
         alertUknownError();

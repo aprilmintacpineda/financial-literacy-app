@@ -6,11 +6,11 @@ import { protectedProcedure } from '../trpc';
 const verifyEmailMutation = protectedProcedure
   .input(verifyEmailDto)
   .mutation(async ({ input, ctx }) => {
-    if (
-      ctx.user.emailVerificationCodeExpiresAt <= new Date() ||
-      ctx.user.emailVerificationCodeTries === 3
-    )
-      throw new TRPCError({ code: 'CONFLICT' });
+    if (ctx.user.emailVerificationCodeExpiresAt <= new Date())
+      throw new TRPCError({ code: 'UNPROCESSABLE_CONTENT' });
+
+    if (ctx.user.emailVerificationCodeTries === 3)
+      throw new TRPCError({ code: 'TOO_MANY_REQUESTS' });
 
     if (ctx.user.emailVerificationCode !== input.code) {
       await UsersRepository.updateUser({

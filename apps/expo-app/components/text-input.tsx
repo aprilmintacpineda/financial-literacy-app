@@ -1,11 +1,15 @@
-import { type ComponentProps } from 'react';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { useState, type ComponentProps } from 'react';
 import { TextInput as RNTextInput, Text, View } from 'react-native';
 import { twJoin, twMerge } from 'tailwind-merge';
+import { useThemeColors } from '../themes';
+import Button from './button';
 
 type tProps = ComponentProps<typeof RNTextInput> & {
   errorMessage?: string | null;
   label?: string;
   isDisabled?: boolean;
+  hideToggleIcon?: boolean;
 };
 
 export default function TextInput ({
@@ -14,8 +18,13 @@ export default function TextInput ({
   isDisabled,
   editable,
   className,
+  secureTextEntry,
+  hideToggleIcon,
   ...rnTextInputProps
 }: tProps) {
+  const colors = useThemeColors();
+  const [isVisible, setIsVisible] = useState(false);
+
   return (
     <View>
       {label && (
@@ -23,22 +32,40 @@ export default function TextInput ({
           className={twJoin(
             'mb-1 font-semibold',
             errorMessage && 'text-error-text',
-            className,
           )}
         >
           {label}
         </Text>
       )}
-      <RNTextInput
-        className={twMerge(
-          'rounded-lg border border-borders p-3',
-          errorMessage && 'border-error-border bg-error-bg',
-          isDisabled &&
-            'border-disabled-border bg-disabled-bg text-disabled-text',
+      <View className="relative">
+        <RNTextInput
+          className={twMerge(
+            'rounded-lg border border-borders p-3',
+            errorMessage && 'border-error-border bg-error-bg',
+            isDisabled &&
+              'border-disabled-border bg-disabled-bg text-disabled-text',
+            secureTextEntry && 'pr-11',
+            className,
+          )}
+          editable={!isDisabled && editable}
+          {...rnTextInputProps}
+          secureTextEntry={secureTextEntry && !isVisible}
+        />
+        {secureTextEntry && !hideToggleIcon && (
+          <Button
+            icon={
+              <MaterialCommunityIcons
+                name={isVisible ? 'eye-off' : 'eye'}
+                color={colors['--color-primary']}
+                size={25}
+              />
+            }
+            className="absolute right-0 top-[50%] mt-[-50%] p-2"
+            variant="text"
+            onPress={() => setIsVisible(!isVisible)}
+          />
         )}
-        editable={!isDisabled && editable}
-        {...rnTextInputProps}
-      />
+      </View>
       <Text className="mb-1 text-sm text-error-text">
         {errorMessage}
       </Text>

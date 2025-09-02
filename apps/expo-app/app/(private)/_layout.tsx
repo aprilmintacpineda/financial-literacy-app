@@ -37,36 +37,49 @@ export default function PrivateStackRoutes () {
         name="add-wallet"
         options={{
           presentation: 'modal',
+          title: 'Add Wallet',
         }}
       />
       <Stack.Screen
         name="edit-wallet"
         options={{
           presentation: 'modal',
+          title: 'Edit Wallet',
         }}
       />
       <Stack.Screen
         name="add-category"
         options={{
           presentation: 'modal',
+          title: 'Add Category',
         }}
       />
       <Stack.Screen
         name="edit-category"
         options={{
           presentation: 'modal',
+          title: 'Edit Category',
         }}
       />
       <Stack.Screen
         name="add-tag"
         options={{
           presentation: 'modal',
+          title: 'Add Tag',
         }}
       />
       <Stack.Screen
         name="edit-tag"
         options={{
           presentation: 'modal',
+          title: 'Edit Tag',
+        }}
+      />
+      <Stack.Screen
+        name="change-password"
+        options={{
+          presentation: 'modal',
+          title: 'Change Password',
         }}
       />
     </Stack>

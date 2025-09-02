@@ -13,7 +13,7 @@ import {
   getEmailVerificationCodeExpiresAt,
 } from '../utils/time';
 
-function mapSingleUserToModel (
+function mapSingleUserToModel(
   results: {
     userId: Users['id'];
     userEmail: Users['email'];
@@ -26,11 +26,15 @@ function mapSingleUserToModel (
     userEmailVerificationCodeTries: Users['emailVerificationCodeTries'];
     userEmailVerifiedAt: Users['emailVerifiedAt'];
     userEmailVerificationCodeCanSentAt: Users['emailVerificationCodeCanSentAt'];
+    userChangePasswordVerificationCode: Users['changePasswordVerificationCode'];
+    userChangePasswordVerificationCodeExpiresAt: Users['changePasswordVerificationCodeExpiresAt'];
+    userChangePasswordVerificationCodeTries: Users['changePasswordVerificationCodeTries'];
+    userChangePasswordVerificationCodeCanSentAt: Users['changePasswordVerificationCodeCanSentAt'];
     organizationId: OrganizationUsers['organizationId'];
     organizationName: Organizations['name'];
     organizationCreatedAt: Organizations['createdAt'];
     organizationUpdatedAt: Organizations['updatedAt'];
-  }[],
+  }[]
 ) {
   if (!results.length) return null;
 
@@ -50,6 +54,14 @@ function mapSingleUserToModel (
       emailVerifiedAt: results[0].userEmailVerifiedAt,
       emailVerificationCodeCanSentAt:
         results[0].userEmailVerificationCodeCanSentAt,
+      changePasswordVerificationCode:
+        results[0].userChangePasswordVerificationCode,
+      changePasswordVerificationCodeExpiresAt:
+        results[0].userChangePasswordVerificationCodeExpiresAt,
+      changePasswordVerificationCodeTries:
+        results[0].userChangePasswordVerificationCodeTries,
+      changePasswordVerificationCodeCanSentAt:
+        results[0].userChangePasswordVerificationCodeCanSentAt,
     },
     results.map(result => {
       return {
@@ -58,27 +70,27 @@ function mapSingleUserToModel (
         createdAt: result.organizationCreatedAt,
         updatedAt: result.organizationUpdatedAt,
       };
-    }),
+    })
   );
 }
 
 export class UsersRepository {
-  static async getUserByEmail (email: string) {
+  static async getUserByEmail(email: string) {
     const result = await database
       .selectFrom('users')
       .innerJoin(
         'organization_users',
         'users.id',
-        'organization_users.userId',
+        'organization_users.userId'
       )
       .innerJoin('organizations', join =>
         join
           .onRef(
             'organizations.id',
             '=',
-            'organization_users.organizationId',
+            'organization_users.organizationId'
           )
-          .on('organizations.deletedAt', 'is', null),
+          .on('organizations.deletedAt', 'is', null)
       )
       .select([
         'users.id as userId',
@@ -92,6 +104,10 @@ export class UsersRepository {
         'users.emailVerificationCodeTries as userEmailVerificationCodeTries',
         'users.emailVerifiedAt as userEmailVerifiedAt',
         'users.emailVerificationCodeCanSentAt as userEmailVerificationCodeCanSentAt',
+        'users.changePasswordVerificationCode as userChangePasswordVerificationCode',
+        'users.changePasswordVerificationCodeExpiresAt as userChangePasswordVerificationCodeExpiresAt',
+        'users.changePasswordVerificationCodeTries as userChangePasswordVerificationCodeTries',
+        'users.changePasswordVerificationCodeCanSentAt as userChangePasswordVerificationCodeCanSentAt',
         'organizations.id as organizationId',
         'organizations.name as organizationName',
         'organizations.createdAt as organizationCreatedAt',
@@ -101,29 +117,29 @@ export class UsersRepository {
         eb.and([
           eb('users.email', '=', email),
           eb('users.deletedAt', 'is', null),
-        ]),
+        ])
       )
       .execute();
 
     return mapSingleUserToModel(result);
   }
 
-  static async getUserById (userId: string) {
+  static async getUserById(userId: string) {
     const results = await database
       .selectFrom('users')
       .innerJoin(
         'organization_users',
         'users.id',
-        'organization_users.userId',
+        'organization_users.userId'
       )
       .innerJoin('organizations', join =>
         join
           .onRef(
             'organizations.id',
             '=',
-            'organization_users.organizationId',
+            'organization_users.organizationId'
           )
-          .on('organizations.deletedAt', 'is', null),
+          .on('organizations.deletedAt', 'is', null)
       )
       .select([
         'users.id as userId',
@@ -137,6 +153,10 @@ export class UsersRepository {
         'users.emailVerificationCodeTries as userEmailVerificationCodeTries',
         'users.emailVerifiedAt as userEmailVerifiedAt',
         'users.emailVerificationCodeCanSentAt as userEmailVerificationCodeCanSentAt',
+        'users.changePasswordVerificationCode as userChangePasswordVerificationCode',
+        'users.changePasswordVerificationCodeExpiresAt as userChangePasswordVerificationCodeExpiresAt',
+        'users.changePasswordVerificationCodeTries as userChangePasswordVerificationCodeTries',
+        'users.changePasswordVerificationCodeCanSentAt as userChangePasswordVerificationCodeCanSentAt',
         'organizations.id as organizationId',
         'organizations.name as organizationName',
         'organizations.createdAt as organizationCreatedAt',
@@ -146,14 +166,14 @@ export class UsersRepository {
         eb.and([
           eb('users.id', '=', userId),
           eb('users.deletedAt', 'is', null),
-        ]),
+        ])
       )
       .execute();
 
     return mapSingleUserToModel(results);
   }
 
-  static async createUser ({
+  static async createUser({
     email,
     name,
     password,
@@ -180,6 +200,7 @@ export class UsersRepository {
             getEmailVerificationCodeCanSentAt(),
           updatedAt: now,
           createdAt: now,
+          changePasswordVerificationCodeTries: 0,
         })
         .execute();
 
@@ -205,7 +226,7 @@ export class UsersRepository {
     });
   }
 
-  static async updateUser ({
+  static async updateUser({
     id,
     ...input
   }: Pick<Users, 'id'> &
@@ -220,6 +241,10 @@ export class UsersRepository {
         | 'emailVerificationCodeTries'
         | 'emailVerificationCodeCanSentAt'
         | 'emailVerifiedAt'
+        | 'changePasswordVerificationCode'
+        | 'changePasswordVerificationCodeExpiresAt'
+        | 'changePasswordVerificationCodeTries'
+        | 'changePasswordVerificationCodeCanSentAt'
       >
     >) {
     await database
@@ -229,8 +254,26 @@ export class UsersRepository {
         updatedAt: new Date(),
       })
       .where(eb =>
-        eb.and([eb('id', '=', id), eb('deletedAt', 'is', null)]),
+        eb.and([eb('id', '=', id), eb('deletedAt', 'is', null)])
       )
+      .execute();
+  }
+
+  static async changePassword(userId: string, newPassword: string) {
+    const hashedPassword = await bcrypt.hash(newPassword, 12);
+    const now = new Date();
+
+    await database
+      .updateTable('users')
+      .set({
+        id: userId,
+        password: hashedPassword,
+        changePasswordVerificationCodeTries: 0,
+        changePasswordVerificationCode: null,
+        changePasswordVerificationCodeCanSentAt: null,
+        changePasswordVerificationCodeExpiresAt: null,
+        updatedAt: now,
+      })
       .execute();
   }
 }

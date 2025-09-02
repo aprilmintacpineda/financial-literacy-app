@@ -1,13 +1,13 @@
 import { sendEmail } from '../utils/s3';
 
-function composeBody (message: string[]) {
+function composeBody(message: string[]) {
   return [
     ...message,
     '<p>Best regards,<br/>The Cash Tracker App Team</p>',
   ].join('');
 }
 
-export async function sendWelcomeEmail ({
+export async function sendWelcomeEmail({
   emailVerificationCode,
   to,
   name,
@@ -27,11 +27,11 @@ export async function sendWelcomeEmail ({
       ]),
     });
   } catch (error) {
-    console.error('Error sending welcome email:', error);
+    console.log('Error sending welcome email:', error);
   }
 }
 
-export async function resendEmailVerificationCode ({
+export async function resendEmailVerificationCode({
   emailVerificationCode,
   to,
   name,
@@ -51,6 +51,54 @@ export async function resendEmailVerificationCode ({
       ]),
     });
   } catch (error) {
-    console.error('Error sending email verification code:', error);
+    console.log('Error sending email verification code:', error);
+  }
+}
+
+export async function changedPasswordEmail({
+  to,
+  name,
+}: {
+  to: string;
+  name: string;
+}) {
+  try {
+    await sendEmail({
+      to,
+      subject: 'Change Password Successful!',
+      body: composeBody([
+        `<p>Hi ${name},</p>`,
+        '<p>We are sending this email to let you know that you have changed your password. If you did not do this, you may get support by sending us email at <a href="mailto:hello@entrepic.com">hello@entrepic.com</a>.</p>',
+      ]),
+    });
+  } catch (error) {
+    console.log('Error sending changed password email:', error);
+  }
+}
+
+export async function sendChangePasswordVerificationEmail({
+  to,
+  name,
+  changePasswordVerificationCode,
+}: {
+  to: string;
+  name: string;
+  changePasswordVerificationCode: string;
+}) {
+  try {
+    await sendEmail({
+      to,
+      subject: 'Change Password Verification Code',
+      body: composeBody([
+        `<p>Hi ${name},</p>`,
+        `<p>Here's your verification code to change your password: <strong>${changePasswordVerificationCode}</strong></p>`,
+        '<p>Please note that this code will expire in 15 minutes.</p>',
+      ]),
+    });
+  } catch (error) {
+    console.log(
+      'Error sending change password verification code:',
+      error
+    );
   }
 }

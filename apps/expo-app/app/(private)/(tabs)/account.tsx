@@ -24,7 +24,7 @@ export default function AccountTab () {
         </Link>
       </View>
       <View className="border-b border-b-borders">
-        <Link href="/change-account-details">
+        <Link href="/change-password">
           <View className="p-5">
             <Text>Change password</Text>
           </View>

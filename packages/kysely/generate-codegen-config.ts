@@ -1,12 +1,12 @@
-import fs from 'fs/promises';
-import path from 'path';
 import {
   supportedCurrenciesCodes,
   supportedTransactionTypes,
   supportedWalletTypes,
 } from '@packages/data-transfer-objects/enums';
+import fs from 'fs/promises';
+import path from 'path';
 
-function toIntersection (values: readonly string[]) {
+function toIntersection(values: readonly string[]) {
   return `'${values.join("' | '")}'`;
 }
 
@@ -25,6 +25,7 @@ function toIntersection (values: readonly string[]) {
         'transactions.currency': currency,
         'transactions.transactionType': transactionTypes,
         'users.emailVerificationCodeTries': 'number',
+        'users.changePasswordVerificationCodeTries': 'number',
       },
     },
   };
@@ -32,6 +33,6 @@ function toIntersection (values: readonly string[]) {
   await fs.writeFile(
     path.join(__dirname, '.kysely-codegenrc.json'),
     JSON.stringify(config, null, 2),
-    'utf-8',
+    'utf-8'
   );
 })();

@@ -1,6 +1,7 @@
 export * from './add-category';
 export * from './add-tag';
 export * from './add-wallet';
+export * from './change-password';
 export * from './edit-category';
 export * from './edit-tag';
 export * from './edit-wallet';

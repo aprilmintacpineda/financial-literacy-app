@@ -15,7 +15,7 @@ interface iProps {
   href?: ComponentProps<typeof Link>['href'];
   icon?: ReactNode;
   className?: ComponentProps<typeof Pressable>['className'];
-  variant?: 'solid' | 'outline';
+  variant?: 'solid' | 'outline' | 'text';
 }
 
 export default function Button ({
@@ -45,13 +45,15 @@ export default function Button ({
       onPressIn={togglePressed}
       onPressOut={togglePressed}
       className={twMerge(
-        'flex-row items-center justify-center gap-2 rounded-lg border border-primary p-4',
+        'flex-row items-center justify-center gap-2 rounded-lg p-4',
         isPressed && 'opacity-50',
         isDisabled
           ? 'border-disabled-border bg-disabled-bg'
           : variant === 'solid'
             ? 'bg-primary'
-            : '',
+            : variant === 'outline'
+              ? 'border border-primary'
+              : '',
         className,
       )}
       disabled={isDisabled}

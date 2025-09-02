@@ -7,7 +7,9 @@ import {
 import { type ComponentProps, useEffect, useState } from 'react';
 import Button from './button';
 
-function secondsLeft (targetDate: Date) {
+function secondsLeft (targetDate?: Date | null) {
+  if (!targetDate) return 0;
+
   const duration = Duration.between(
     LocalDateTime.now(),
     LocalDateTime.ofInstant(
@@ -25,7 +27,7 @@ export default function TimedButton ({
   isDisabled,
   ...btnProps
 }: {
-  toDate: Date;
+  toDate?: Date | null;
   label: string;
 } & Omit<ComponentProps<typeof Button>, 'label'>) {
   const [count, setCount] = useState(() => secondsLeft(toDate));

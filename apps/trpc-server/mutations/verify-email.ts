@@ -6,6 +6,9 @@ import { protectedProcedure } from '../trpc';
 const verifyEmailMutation = protectedProcedure
   .input(verifyEmailDto)
   .mutation(async ({ input, ctx }) => {
+    if (ctx.user.emailVerifiedAt)
+      throw new TRPCError({ code: 'CONFLICT' });
+
     if (ctx.user.emailVerificationCodeExpiresAt <= new Date())
       throw new TRPCError({ code: 'UNPROCESSABLE_CONTENT' });
 

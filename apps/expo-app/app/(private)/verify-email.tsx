@@ -43,6 +43,10 @@ export default function VerifyEmail () {
         alertMessage('Your verification code has expired.');
       } else if (error.data?.code === 'TOO_MANY_REQUESTS') {
         alertMessage('You have reached the maximum attempts.');
+      } else if (error.data?.code === 'CONFLICT') {
+        alertMessage(
+          'Your email is already verified. Please try to close and reopen the app.',
+        );
       } else {
         // @todo log to sentry?
         alertUknownError();

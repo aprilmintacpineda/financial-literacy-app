@@ -19,6 +19,7 @@ export async function createTRPCContext ({
       const token = authorization.replace('Bearer ', '');
       const id = await verifyJwt(token);
       user = await UsersRepository.getUserById(id);
+      // @todo update user lastActiveAt
     }
   } catch (_error) {
     console.log(_error);

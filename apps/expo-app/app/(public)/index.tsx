@@ -11,7 +11,7 @@ import { useAuthContext } from '../../contexts/auth';
 import { alertMessage, alertUknownError } from '../../utils/alerts';
 import { trpc, type tTRPCClientError } from '../../utils/trpc';
 
-export default function HomeScreen () {
+export default function HomeScreen() {
   const { mutateAsync } = trpc.signInMutation.useMutation();
   const { login, isLoggedIn } = useAuthContext();
   const router = useRouter();
@@ -32,8 +32,8 @@ export default function HomeScreen () {
       login(token, publicUserData, publicUserData.organizations[0]);
 
       if (publicUserData.isEmailVerified)
-        router.replace('/(private)/(tabs)/transactions');
-      else router.replace('/(private)/verify-email');
+        router.replace('/transactions');
+      else router.replace('/verify-email');
     } catch (_error) {
       console.log(_error);
 
@@ -45,8 +45,7 @@ export default function HomeScreen () {
     }
   });
 
-  if (isLoggedIn)
-    return <Redirect href="/(private)/(tabs)/transactions" />;
+  if (isLoggedIn) return <Redirect href="/transactions" />;
 
   return (
     <View className="flex-1 bg-primary">

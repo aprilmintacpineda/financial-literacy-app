@@ -8,10 +8,10 @@ export const addWalletDto = z.object({
   name: z
     .string({ invalid_type_error: 'Name must be a string' })
     .nonempty('Please enter wallet name'),
-  initialAmount: z.number({
+  amount: z.number({
     invalid_type_error: 'Initial amount must be a number',
   }),
-  organizationId: z.string(),
+  organizationId: z.string().nonempty(),
   walletType: z.enum(supportedWalletTypes, {
     invalid_type_error: 'Please select wallet type from the options',
     required_error: 'Please select a wallet type',

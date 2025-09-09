@@ -1,13 +1,15 @@
 import { type SignUpDto } from '@packages/data-transfer-objects/dtos';
-import { createId } from '@paralleldrive/cuid2';
 import bcrypt from 'bcrypt';
+import { type Transaction } from 'kysely';
 import { database } from '../database';
 import {
+  type DB,
   type Organizations,
   type OrganizationUsers,
   type Users,
 } from '../database-types';
 import { UserModel } from '../models';
+import { uniqueId } from '../utils/generators';
 import {
   getEmailVerificationCodeCanSentAt,
   getEmailVerificationCodeExpiresAt,
@@ -173,81 +175,97 @@ export class UsersRepository {
     return mapSingleUserToModel(results);
   }
 
-  static async createUser({
-    email,
-    name,
-    password,
-    emailVerificationCode,
-  }: SignUpDto & { emailVerificationCode: string }) {
-    await database.transaction().execute(async trx => {
-      const hashedPassword = await bcrypt.hash(password, 12);
-      const now = new Date();
-      const userId = createId();
-      const organizationId = createId();
+  static async createUser(
+    {
+      email,
+      name,
+      password,
+      emailVerificationCode,
+    }: SignUpDto & { emailVerificationCode: string },
+    trx?: Transaction<DB>
+  ) {
+    const connection = trx ?? database;
 
-      await trx
-        .insertInto('users')
-        .values({
-          id: userId,
-          email,
-          password: hashedPassword,
-          name,
-          emailVerificationCode,
-          emailVerificationCodeExpiresAt:
-            getEmailVerificationCodeExpiresAt(),
-          emailVerificationCodeTries: 0,
-          emailVerificationCodeCanSentAt:
-            getEmailVerificationCodeCanSentAt(),
-          updatedAt: now,
-          createdAt: now,
-          changePasswordVerificationCodeTries: 0,
-        })
-        .execute();
+    const userId = await connection
+      .transaction()
+      .execute(async trx => {
+        const hashedPassword = await bcrypt.hash(password, 12);
+        const now = new Date();
+        const userId = uniqueId();
+        const organizationId = uniqueId();
 
-      await trx
-        .insertInto('organizations')
-        .values({
-          id: organizationId,
-          name: 'Personal Finance',
-          createdAt: now,
-          updatedAt: now,
-        })
-        .execute();
+        await trx
+          .insertInto('users')
+          .values({
+            id: userId,
+            email,
+            password: hashedPassword,
+            name,
+            emailVerificationCode,
+            emailVerificationCodeExpiresAt:
+              getEmailVerificationCodeExpiresAt(),
+            emailVerificationCodeTries: 0,
+            emailVerificationCodeCanSentAt:
+              getEmailVerificationCodeCanSentAt(),
+            updatedAt: now,
+            createdAt: now,
+            changePasswordVerificationCodeTries: 0,
+          })
+          .execute();
 
-      await trx
-        .insertInto('organization_users')
-        .values({
-          userId,
-          organizationId,
-          createdAt: now,
-          updatedAt: now,
-        })
-        .execute();
-    });
+        await trx
+          .insertInto('organizations')
+          .values({
+            id: organizationId,
+            name: 'Personal Finance',
+            createdAt: now,
+            updatedAt: now,
+          })
+          .execute();
+
+        await trx
+          .insertInto('organization_users')
+          .values({
+            userId,
+            organizationId,
+            createdAt: now,
+            updatedAt: now,
+          })
+          .execute();
+
+        return userId;
+      });
+
+    return userId;
   }
 
-  static async updateUser({
-    id,
-    ...input
-  }: Pick<Users, 'id'> &
-    Partial<
-      Pick<
-        Users,
-        | 'id'
-        | 'password'
-        | 'name'
-        | 'emailVerificationCode'
-        | 'emailVerificationCodeExpiresAt'
-        | 'emailVerificationCodeTries'
-        | 'emailVerificationCodeCanSentAt'
-        | 'emailVerifiedAt'
-        | 'changePasswordVerificationCode'
-        | 'changePasswordVerificationCodeExpiresAt'
-        | 'changePasswordVerificationCodeTries'
-        | 'changePasswordVerificationCodeCanSentAt'
-      >
-    >) {
-    await database
+  static async updateUser(
+    {
+      id,
+      ...input
+    }: Pick<Users, 'id'> &
+      Partial<
+        Pick<
+          Users,
+          | 'id'
+          | 'password'
+          | 'name'
+          | 'emailVerificationCode'
+          | 'emailVerificationCodeExpiresAt'
+          | 'emailVerificationCodeTries'
+          | 'emailVerificationCodeCanSentAt'
+          | 'emailVerifiedAt'
+          | 'changePasswordVerificationCode'
+          | 'changePasswordVerificationCodeExpiresAt'
+          | 'changePasswordVerificationCodeTries'
+          | 'changePasswordVerificationCodeCanSentAt'
+        >
+      >,
+    trx?: Transaction<DB>
+  ) {
+    const connection = trx ?? database;
+
+    await connection
       .updateTable('users')
       .set({
         ...input,
@@ -259,14 +277,18 @@ export class UsersRepository {
       .execute();
   }
 
-  static async changePassword(userId: string, newPassword: string) {
+  static async changePassword(
+    id: string,
+    newPassword: string,
+    trx?: Transaction<DB>
+  ) {
+    const connection = trx ?? database;
     const hashedPassword = await bcrypt.hash(newPassword, 12);
     const now = new Date();
 
-    await database
+    await connection
       .updateTable('users')
       .set({
-        id: userId,
         password: hashedPassword,
         changePasswordVerificationCodeTries: 0,
         changePasswordVerificationCode: null,
@@ -274,6 +296,9 @@ export class UsersRepository {
         changePasswordVerificationCodeExpiresAt: null,
         updatedAt: now,
       })
+      .where(eb =>
+        eb.and([eb('id', '=', id), eb('deletedAt', 'is', null)])
+      )
       .execute();
   }
 }

@@ -1,5 +1,4 @@
 import { TagsRepository } from '@packages/kysely/repositories';
-import { TRPCError } from '@trpc/server';
 import z from 'zod';
 import { verifiedUserProcedure } from '../trpc';
 
@@ -9,11 +8,10 @@ const getTagsQuery = verifiedUserProcedure
       organizationId: z.string(),
     })
   )
-  .query(async ({ input: { organizationId }, ctx }) => {
-    if (!ctx.user.isPartOfOrganization(organizationId))
-      throw new TRPCError({ code: 'FORBIDDEN' });
-
-    const tags = await TagsRepository.getAllTags(organizationId);
+  .query(async ({ input }) => {
+    const tags = await TagsRepository.getAllTags(
+      input.organizationId
+    );
 
     return tags.map(tag => tag.publicData);
   });

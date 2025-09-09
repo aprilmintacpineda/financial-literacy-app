@@ -2,50 +2,41 @@ import {
   type AddWalletDto,
   type EditWalletDto,
 } from '@packages/data-transfer-objects/dtos';
-import { createId } from '@paralleldrive/cuid2';
+import { type Transaction } from 'kysely';
 import { database } from '../database';
-import { type Wallets } from '../database-types';
+import { type DB, type Wallets } from '../database-types';
 import { WalletModel } from '../models';
+import { omit } from '../utils/data-manipulation';
+import { uniqueId } from '../utils/generators';
 
-function mapResultToModel (result: Omit<Wallets, 'deletedAt'>) {
-  return new WalletModel({
-    id: result.id,
-    amount: result.amount,
-    name: result.name,
-    organizationId: result.organizationId,
-    walletType: result.walletType,
-    currency: result.currency,
-    updatedAt: result.updatedAt,
-    createdAt: result.createdAt,
-  });
+function mapResultToModel(result: Wallets) {
+  const walletData = omit(result, ['deletedAt']);
+  return new WalletModel(walletData);
 }
 
 export class WalletsRepository {
-  static async createWallet ({
-    initialAmount,
-    name,
-    organizationId,
-    walletType,
-    currency,
-  }: AddWalletDto) {
+  static async createWallet(
+    values: AddWalletDto,
+    trx?: Transaction<DB>
+  ) {
+    const connection = trx ?? database;
     const now = new Date();
+    const id = uniqueId();
 
-    await database
+    await connection
       .insertInto('wallets')
       .values({
-        id: createId(),
-        name,
-        amount: initialAmount,
-        organizationId,
-        walletType,
-        currency,
+        ...values,
+        id,
         createdAt: now,
         updatedAt: now,
       })
       .execute();
+
+    return id;
   }
 
-  static async getAllWallets (organizationId: string) {
+  static async getAllWallets(organizationId: string) {
     const wallets = await database
       .selectFrom('wallets')
       .selectAll()
@@ -53,19 +44,23 @@ export class WalletsRepository {
         eb.and([
           eb('organizationId', '=', organizationId),
           eb('deletedAt', 'is', null),
-        ]),
+        ])
       )
       .execute();
 
     return wallets.map(mapResultToModel);
   }
 
-  static async getWalletById (id: string) {
+  static async getWalletById(organizationId: string, id: string) {
     const wallet = await database
       .selectFrom('wallets')
       .selectAll()
       .where(eb =>
-        eb.and([eb('id', '=', id), eb('deletedAt', 'is', null)]),
+        eb.and([
+          eb('id', '=', id),
+          eb('organizationId', '=', organizationId),
+          eb('deletedAt', 'is', null),
+        ])
       )
       .executeTakeFirst();
 
@@ -74,21 +69,49 @@ export class WalletsRepository {
     return mapResultToModel(wallet);
   }
 
-  static async editWallet (
+  static async editWallet(
     organizationId: string,
-    { id, name }: EditWalletDto,
+    { id, ...values }: EditWalletDto,
+    trx?: Transaction<DB>
   ) {
-    await database
+    const connection = trx ?? database;
+
+    await connection
       .updateTable('wallets')
       .set({
-        name,
+        ...values,
         updatedAt: new Date(),
       })
       .where(eb =>
         eb.and([
           eb('id', '=', id),
           eb('organizationId', '=', organizationId),
-        ]),
+          eb('deletedAt', 'is', null),
+        ])
+      )
+      .execute();
+  }
+
+  static async updateAmount(
+    organizationId: string,
+    id: string,
+    amount: number,
+    trx?: Transaction<DB>
+  ) {
+    const connection = trx ?? database;
+
+    await connection
+      .updateTable('wallets')
+      .set({
+        amount,
+        updatedAt: new Date(),
+      })
+      .where(eb =>
+        eb.and([
+          eb('organizationId', '=', organizationId),
+          eb('id', '=', id),
+          eb('deletedAt', 'is', null),
+        ])
       )
       .execute();
   }

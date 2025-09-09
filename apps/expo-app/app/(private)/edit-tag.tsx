@@ -8,13 +8,15 @@ import { useForm } from 'react-hook-form';
 import { View } from 'react-native';
 import FormSubmitButton from '../../components/forms/submit-button';
 import FormTextInput from '../../components/forms/text-input';
+import { useAuthContext } from '../../contexts/auth';
 import { alertMessage, alertUknownError } from '../../utils/alerts';
 import { trpc } from '../../utils/trpc';
 
-export default function EditTag () {
+export default function EditTag() {
   const { id, name, description } =
     useLocalSearchParams<EditTagDto>();
   const router = useRouter();
+  const { activeOrganization } = useAuthContext(true);
 
   const { control, handleSubmit } = useForm({
     resolver: zodResolver(editTagDto),
@@ -22,6 +24,7 @@ export default function EditTag () {
       id,
       name,
       description,
+      organizationId: activeOrganization.id,
     } satisfies EditTagDto,
     mode: 'all',
   });

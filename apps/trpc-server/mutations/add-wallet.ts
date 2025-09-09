@@ -1,14 +1,10 @@
 import { addWalletDto } from '@packages/data-transfer-objects/dtos';
 import { WalletsRepository } from '@packages/kysely/repositories';
-import { TRPCError } from '@trpc/server';
 import { verifiedUserProcedure } from '../trpc';
 
 const addWalletMutation = verifiedUserProcedure
   .input(addWalletDto)
-  .mutation(async ({ ctx, input }) => {
-    if (!ctx.user.isPartOfOrganization(input.organizationId))
-      throw new TRPCError({ code: 'FORBIDDEN' });
-
+  .mutation(async ({ input }) => {
     await WalletsRepository.createWallet(input);
   });
 

@@ -18,7 +18,7 @@ import Routes from './routes';
 
 SplashScreen.preventAutoHideAsync();
 
-export default function Main () {
+export default function Main() {
   const queryClient = useMemo(
     () =>
       new QueryClient({
@@ -31,7 +31,7 @@ export default function Main () {
           },
         },
       }),
-    [],
+    []
   );
 
   const { token, status } = useAuthContext();
@@ -50,7 +50,7 @@ export default function Main () {
       links: [
         httpBatchLink({
           transformer: SuperJSON,
-          url: 'http://localhost:3000/trpc',
+          url: 'http://192.168.31.95:3000/trpc',
           headers: () => {
             const headers = new Headers();
 

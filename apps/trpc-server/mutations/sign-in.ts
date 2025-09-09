@@ -12,6 +12,8 @@ const signInMutation = publicProcedure
     if (!user || !(await user.isPasswordCorrect(password)))
       throw new TRPCError({ code: 'UNAUTHORIZED' });
 
+    // @todo update user lastActiveAt
+
     const token = await createJwt(user.id);
 
     return {

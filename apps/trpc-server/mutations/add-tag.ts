@@ -1,14 +1,10 @@
 import { addTagDto } from '@packages/data-transfer-objects/dtos';
 import { TagsRepository } from '@packages/kysely/repositories';
-import { TRPCError } from '@trpc/server';
 import { verifiedUserProcedure } from '../trpc';
 
 const addTagMutation = verifiedUserProcedure
   .input(addTagDto)
-  .mutation(async ({ ctx, input }) => {
-    if (!ctx.user.isPartOfOrganization(input.organizationId))
-      throw new TRPCError({ code: 'FORBIDDEN' });
-
+  .mutation(async ({ input }) => {
     await TagsRepository.createTag(input);
   });
 

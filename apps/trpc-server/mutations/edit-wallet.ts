@@ -5,14 +5,13 @@ import { verifiedUserProcedure } from '../trpc';
 
 const editWalletMutation = verifiedUserProcedure
   .input(editWalletDto)
-  .mutation(async ({ ctx, input }) => {
-    const wallet = await WalletsRepository.getWalletById(input.id);
+  .mutation(async ({ input }) => {
+    const wallet = await WalletsRepository.getWalletById(
+      input.organizationId,
+      input.id
+    );
 
-    if (
-      !wallet ||
-      !ctx.user.isPartOfOrganization(wallet.organizationId)
-    )
-      throw new TRPCError({ code: 'NOT_FOUND' });
+    if (!wallet) throw new TRPCError({ code: 'NOT_FOUND' });
 
     await WalletsRepository.editWallet(wallet.organizationId, input);
   });

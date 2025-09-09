@@ -6,7 +6,7 @@ import { twMerge } from 'tailwind-merge';
 import { useAuthContext } from '../../../contexts/auth';
 import { useThemeColors } from '../../../themes';
 
-export default function AccountTab () {
+export default function AccountTab() {
   const themeColors = useThemeColors();
   const { publicUserData, activeOrganization } =
     useAuthContext(true);
@@ -14,7 +14,7 @@ export default function AccountTab () {
   return (
     <SafeAreaView>
       <View className="bg-disabled-border p-2">
-        <Text className="font-bold">Account Settings</Text>
+        <Text className="font-bold">Your account</Text>
       </View>
       <View className="border-b border-b-borders">
         <Link href="/change-account-details">
@@ -31,7 +31,7 @@ export default function AccountTab () {
         </Link>
       </View>
       <View className="bg-disabled-border p-2">
-        <Text className="font-bold">Teams</Text>
+        <Text className="font-bold">Your Teams</Text>
       </View>
       {publicUserData.organizations.map(organization => {
         const isActiveOrg =
@@ -46,7 +46,7 @@ export default function AccountTab () {
               <View
                 className={twMerge(
                   'flex-row items-center gap-2 p-5',
-                  isActiveOrg ? 'bg-primary' : '',
+                  isActiveOrg ? 'bg-primary' : ''
                 )}
               >
                 {isActiveOrg && (
@@ -60,7 +60,7 @@ export default function AccountTab () {
                 )}
                 <Text
                   className={twMerge(
-                    isActiveOrg ? 'text-primary-contrast-text' : '',
+                    isActiveOrg ? 'text-primary-contrast-text' : ''
                   )}
                 >
                   {organization.name}
@@ -70,6 +70,16 @@ export default function AccountTab () {
           </View>
         );
       })}
+      <View className="bg-disabled-border p-2">
+        <Text className="font-bold">Others</Text>
+      </View>
+      <View className="border-b border-b-borders">
+        <Link href="/tutorial">
+          <View className="p-5">
+            <Text>Tutorial</Text>
+          </View>
+        </Link>
+      </View>
     </SafeAreaView>
   );
 }

@@ -1,5 +1,6 @@
 import addCategoryMutation from './mutations/add-category';
 import addTagMutation from './mutations/add-tag';
+import addTransactionMutation from './mutations/add-transaction';
 import addWalletMutation from './mutations/add-wallet';
 import changePasswordMutation from './mutations/change-password';
 import changePasswordSendVerificationCodeMutation from './mutations/change-password-send-code';
@@ -13,6 +14,7 @@ import validateTokenMutation from './mutations/validate-token';
 import verifyEmailMutation from './mutations/verify-email';
 import getCategoriesQuery from './queries/get-categories';
 import getTagsQuery from './queries/get-tags';
+import getTransactionsQuery from './queries/get-transactions';
 import getWalletsQuery from './queries/get-wallets';
 import { trpc } from './trpc';
 
@@ -32,6 +34,7 @@ export const appRouter = trpc.router({
   addWalletMutation,
   getWalletsQuery,
   editWalletMutation,
+  getTransactionsQuery,
 
   // categories
   editCategoryMutation,
@@ -42,4 +45,7 @@ export const appRouter = trpc.router({
   addTagMutation,
   getTagsQuery,
   editTagMutation,
+
+  // transactions
+  addTransactionMutation,
 });

@@ -2,44 +2,38 @@ import {
   type AddTagDto,
   type EditTagDto,
 } from '@packages/data-transfer-objects/dtos';
-import { createId } from '@paralleldrive/cuid2';
+import { type Transaction } from 'kysely';
 import { database } from '../database';
-import { type Tags } from '../database-types';
+import { type DB, type Tags } from '../database-types';
 import { TagModel } from '../models';
+import { omit } from '../utils/data-manipulation';
+import { uniqueId } from '../utils/generators';
 
-function mapResultsToModel (result: Omit<Tags, 'deletedAt'>) {
-  return new TagModel({
-    id: result.id,
-    description: result.description,
-    name: result.name,
-    organizationId: result.organizationId,
-    updatedAt: result.updatedAt,
-    createdAt: result.createdAt,
-  });
+function mapResultsToModel(result: Tags) {
+  const tagData = omit(result, ['deletedAt']);
+  return new TagModel(tagData);
 }
 
 export class TagsRepository {
-  static async createTag ({
-    name,
-    description,
-    organizationId,
-  }: AddTagDto) {
+  static async createTag(values: AddTagDto, trx?: Transaction<DB>) {
+    const connect = trx ?? database;
     const now = new Date();
+    const id = uniqueId();
 
-    await database
+    await connect
       .insertInto('tags')
       .values({
-        id: createId(),
-        name,
-        description,
-        organizationId,
+        ...values,
+        id,
         createdAt: now,
         updatedAt: now,
       })
       .execute();
+
+    return id;
   }
 
-  static async getAllTags (organizationId: string) {
+  static async getAllTags(organizationId: string) {
     const result = await database
       .selectFrom('tags')
       .selectAll()
@@ -47,18 +41,24 @@ export class TagsRepository {
         eb.and([
           eb('organizationId', '=', organizationId),
           eb('deletedAt', 'is', null),
-        ]),
+        ])
       )
       .execute();
 
     return result.map(mapResultsToModel);
   }
 
-  static async getTagById (id: string) {
+  static async getTagById(organizationId: string, id: string) {
     const tag = await database
       .selectFrom('tags')
       .selectAll()
-      .where('id', '=', id)
+      .where(eb =>
+        eb.and([
+          eb('id', '=', id),
+          eb('deletedAt', 'is', null),
+          eb('organizationId', '=', organizationId),
+        ])
+      )
       .executeTakeFirst();
 
     if (!tag) return null;
@@ -66,15 +66,17 @@ export class TagsRepository {
     return mapResultsToModel(tag);
   }
 
-  static async editTag (
+  static async editTag(
     organizationId: string,
-    { id, name, description }: EditTagDto,
+    { id, ...values }: EditTagDto,
+    trx?: Transaction<DB>
   ) {
-    await database
+    const connect = trx ?? database;
+
+    await connect
       .updateTable('tags')
       .set({
-        name,
-        description,
+        ...values,
         updatedAt: new Date(),
       })
       .where(eb =>
@@ -82,7 +84,7 @@ export class TagsRepository {
           eb('id', '=', id),
           eb('deletedAt', 'is', null),
           eb('organizationId', '=', organizationId),
-        ]),
+        ])
       )
       .execute();
   }

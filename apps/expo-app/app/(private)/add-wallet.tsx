@@ -3,7 +3,7 @@ import {
   type AddWalletDto,
   addWalletDto,
 } from '@packages/data-transfer-objects/dtos';
-import { supportedCurrencies } from '@packages/data-transfer-objects/enums';
+import { currenciesOptions } from '@packages/data-transfer-objects/enums';
 import { useRouter } from 'expo-router';
 import { useForm } from 'react-hook-form';
 import { View } from 'react-native';
@@ -14,15 +14,6 @@ import FormTextInput from '../../components/forms/text-input';
 import { useAuthContext } from '../../contexts/auth';
 import { alertMessage, alertUknownError } from '../../utils/alerts';
 import { trpc } from '../../utils/trpc';
-
-const currenciesOptions = supportedCurrencies.map(
-  ({ code, name }) => {
-    return {
-      label: `${code} - ${name}`,
-      value: code,
-    };
-  },
-);
 
 const walletTypeOptions = [
   {
@@ -35,7 +26,7 @@ const walletTypeOptions = [
   },
 ];
 
-export default function AddWallet () {
+export default function AddWallet() {
   const { activeOrganization } = useAuthContext(true);
   const router = useRouter();
 
@@ -43,7 +34,7 @@ export default function AddWallet () {
     resolver: zodResolver(addWalletDto),
     values: {
       name: '',
-      initialAmount: 0,
+      amount: 0,
       organizationId: activeOrganization.id,
       currency: 'PHP',
       walletType: 'Debit',
@@ -70,7 +61,7 @@ export default function AddWallet () {
       <FormTextInput control={control} name="name" label="Name" />
       <FormNumberInput
         control={control}
-        name="initialAmount"
+        name="amount"
         label="Initial Amount"
       />
       <FormSelectOptions

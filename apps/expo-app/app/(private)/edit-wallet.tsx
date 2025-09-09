@@ -8,18 +8,21 @@ import { useForm } from 'react-hook-form';
 import { View } from 'react-native';
 import FormSubmitButton from '../../components/forms/submit-button';
 import FormTextInput from '../../components/forms/text-input';
+import { useAuthContext } from '../../contexts/auth';
 import { alertMessage, alertUknownError } from '../../utils/alerts';
 import { trpc } from '../../utils/trpc';
 
-export default function EditWallet () {
+export default function EditWallet() {
   const { id, name } = useLocalSearchParams<EditWalletDto>();
   const router = useRouter();
+  const { activeOrganization } = useAuthContext(true);
 
   const { control, handleSubmit } = useForm({
     resolver: zodResolver(editWalletDto),
     values: {
       id,
       name,
+      organizationId: activeOrganization.id,
     } satisfies EditWalletDto,
     mode: 'all',
   });

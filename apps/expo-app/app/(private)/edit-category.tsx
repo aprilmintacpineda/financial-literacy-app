@@ -8,17 +8,20 @@ import { useForm } from 'react-hook-form';
 import { View } from 'react-native';
 import FormSubmitButton from '../../components/forms/submit-button';
 import FormTextInput from '../../components/forms/text-input';
+import { useAuthContext } from '../../contexts/auth';
 import { alertMessage, alertUknownError } from '../../utils/alerts';
 import { trpc } from '../../utils/trpc';
 
-export default function EditCategory () {
+export default function EditCategory() {
   const { id, name, description } =
     useLocalSearchParams<EditCategoryDto>();
   const router = useRouter();
+  const { activeOrganization } = useAuthContext(true);
 
   const { control, handleSubmit } = useForm({
     resolver: zodResolver(editCategoryDto),
     values: {
+      organizationId: activeOrganization.id,
       id,
       name,
       description,

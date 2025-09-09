@@ -5,16 +5,13 @@ import { verifiedUserProcedure } from '../trpc';
 
 const editCategoryMutation = verifiedUserProcedure
   .input(editCategoryDto)
-  .mutation(async ({ ctx, input }) => {
+  .mutation(async ({ input }) => {
     const category = await CategoriesRepository.getCategoryById(
+      input.organizationId,
       input.id
     );
 
-    if (
-      !category ||
-      !ctx.user.isPartOfOrganization(category.organizationId)
-    )
-      throw new TRPCError({ code: 'NOT_FOUND' });
+    if (!category) throw new TRPCError({ code: 'NOT_FOUND' });
 
     await CategoriesRepository.editCategory(
       category.organizationId,

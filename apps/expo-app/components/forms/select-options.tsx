@@ -10,14 +10,6 @@ import SelectOptions from '../select-options';
 type FormSelectOptionsProps<T extends FieldValues> = Omit<
   ComponentProps<typeof SelectOptions>,
   'errorMessage' | 'value' | 'onChange'
-
-  // options: string[];
-  // onChange: (selectedIndex: number) => void;
-  // value: string;
-  // label: string;
-  // errorMessage?: string | null;
-  // isDisabled?: boolean;
-  // isSearchable?: boolean;
 > & {
   control: Control<T>;
   name: FieldPath<T>;

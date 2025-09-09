@@ -1,6 +1,11 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useState, type ComponentProps } from 'react';
-import { TextInput as RNTextInput, Text, View } from 'react-native';
+import {
+  ActivityIndicator,
+  TextInput as RNTextInput,
+  Text,
+  View,
+} from 'react-native';
 import { twJoin, twMerge } from 'tailwind-merge';
 import { useThemeColors } from '../themes';
 import Button from './button';
@@ -10,6 +15,7 @@ type tProps = ComponentProps<typeof RNTextInput> & {
   label?: string;
   isDisabled?: boolean;
   hideToggleIcon?: boolean;
+  isLoading?: boolean;
 };
 
 export default function TextInput ({
@@ -20,6 +26,7 @@ export default function TextInput ({
   className,
   secureTextEntry,
   hideToggleIcon,
+  isLoading,
   ...rnTextInputProps
 }: tProps) {
   const colors = useThemeColors();
@@ -42,12 +49,12 @@ export default function TextInput ({
           className={twMerge(
             'rounded-lg border border-borders p-3',
             errorMessage && 'border-error-border bg-error-bg',
-            isDisabled &&
+            (isDisabled || isLoading) &&
               'border-disabled-border bg-disabled-bg text-disabled-text',
             secureTextEntry && 'pr-11',
             className,
           )}
-          editable={!isDisabled && editable}
+          editable={!isDisabled && editable && !isLoading}
           {...rnTextInputProps}
           secureTextEntry={secureTextEntry && !isVisible}
         />
@@ -64,6 +71,11 @@ export default function TextInput ({
             variant="text"
             onPress={() => setIsVisible(!isVisible)}
           />
+        )}
+        {isLoading && (
+          <View className="absolute bottom-0 left-0 right-0 top-0 items-center justify-center">
+            <ActivityIndicator size={15} />
+          </View>
         )}
       </View>
       <Text className="mb-1 text-sm text-error-text">

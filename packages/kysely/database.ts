@@ -2,6 +2,7 @@ import { Kysely, MysqlDialect } from 'kysely';
 import { createPool } from 'mysql2';
 import { type DB } from './database-types';
 import env from './env';
+import { RequireWhereOnUpdatePlugin } from './plugins/require-where-on-update';
 
 export const database = new Kysely<DB>({
   dialect: new MysqlDialect({
@@ -13,4 +14,4 @@ export const database = new Kysely<DB>({
   }),
   log:
     env.NODE_ENV !== 'production' ? ['query', 'error'] : undefined,
-});
+}).withPlugin(new RequireWhereOnUpdatePlugin());

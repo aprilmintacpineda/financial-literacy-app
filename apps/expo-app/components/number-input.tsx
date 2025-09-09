@@ -13,11 +13,13 @@ type tNumberInputProps = Omit<
 > & {
   value: number;
   onValueChange: (value: number) => void;
+  maxDecimalDigits?: number;
 };
 
 const NumberInput = ({
   value,
   onValueChange,
+  maxDecimalDigits = 5,
   ...textInputProps
 }: tNumberInputProps) => {
   const [input, setInput] = useState('');
@@ -28,7 +30,8 @@ const NumberInput = ({
       .replace(/[^0-9]/g, '')
       .replace(/^0{1,}/, '0');
 
-    if (value.includes('.')) newValue += `.${decimal}`.slice(0, 3);
+    if (value.includes('.'))
+      newValue += `.${decimal}`.slice(0, maxDecimalDigits + 1);
 
     setInput(newValue);
   }, []);
@@ -42,8 +45,12 @@ const NumberInput = ({
       Number(whole),
     );
 
-    if (input.includes('.'))
-      formattedValue += `.${decimal ?? ''}`.slice(0, 3);
+    if (input.includes('.')) {
+      formattedValue += `.${decimal ?? ''}`.slice(
+        0,
+        maxDecimalDigits + 1,
+      );
+    }
 
     return formattedValue;
   }, [input]);

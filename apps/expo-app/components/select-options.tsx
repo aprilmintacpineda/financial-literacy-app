@@ -1,3 +1,4 @@
+import { MaterialIcons } from '@expo/vector-icons';
 import {
   useCallback,
   useEffect,
@@ -16,6 +17,8 @@ import ActionSheet, {
   type ActionSheetRef,
 } from 'react-native-actions-sheet';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { twMerge } from 'tailwind-merge';
+import { useThemeColors } from '../themes';
 import TextInput from './text-input';
 
 type tSelectOptionsProps<Value = any> = {
@@ -23,15 +26,17 @@ type tSelectOptionsProps<Value = any> = {
     label: string;
     value: Value;
   }[];
-  onChange: (selectedIndex: Value) => void;
+  onChange: (value: Value) => void;
   value: string;
   label: string;
   errorMessage?: string | null;
   isDisabled?: boolean;
   isSearchable?: boolean;
+  isLoading?: boolean;
+  mapValueToLabel?: (value: Value) => string;
 };
 
-export default function SelectOptions ({
+export default function SelectOptions<Value> ({
   onChange,
   options,
   value,
@@ -39,15 +44,18 @@ export default function SelectOptions ({
   errorMessage,
   isDisabled,
   isSearchable,
-}: tSelectOptionsProps) {
+  isLoading,
+  mapValueToLabel,
+}: tSelectOptionsProps<Value>) {
   const timer = useRef<NodeJS.Timeout>(null);
   const [searchInput, setSearchInput] = useState('');
   const actionSheetRef = useRef<ActionSheetRef>(null);
   const insets = useSafeAreaInsets();
+  const themeColors = useThemeColors();
 
   const showOptions = useCallback(() => {
-    if (!isDisabled) actionSheetRef.current?.show();
-  }, [isDisabled]);
+    if (!isDisabled && !isLoading) actionSheetRef.current?.show();
+  }, [isDisabled, isLoading]);
 
   const onClose = useCallback(() => {
     timer.current = setTimeout(() => {
@@ -73,15 +81,23 @@ export default function SelectOptions ({
 
   return (
     <>
-      <Pressable onPress={showOptions} disabled={isDisabled}>
+      <Pressable
+        onPress={showOptions}
+        disabled={isDisabled || isLoading}
+      >
         <View pointerEvents="none">
           <TextInput
             label={label}
-            value={value}
+            value={
+              mapValueToLabel
+                ? mapValueToLabel(value as Value)
+                : value
+            }
             editable={false}
             isDisabled={isDisabled}
             errorMessage={errorMessage}
             autoCapitalize="none"
+            isLoading={isLoading}
           />
         </View>
       </Pressable>
@@ -89,6 +105,7 @@ export default function SelectOptions ({
         ref={actionSheetRef}
         containerStyle={{
           height: isSearchable ? 500 : undefined,
+          overflow: 'hidden',
         }}
         onClose={onClose}
       >
@@ -117,7 +134,12 @@ export default function SelectOptions ({
               </Text>
             </View>
           }
+          ItemSeparatorComponent={() => (
+            <View className="border-t-hairline border-t-borders" />
+          )}
           renderItem={({ item }) => {
+            const isSelected = value === item.value;
+
             return (
               <TouchableOpacity
                 onPress={() => {
@@ -125,8 +147,28 @@ export default function SelectOptions ({
                   actionSheetRef.current?.hide();
                 }}
               >
-                <View className="border-t-hairline border-t-borders p-4">
-                  <Text>{item.label}</Text>
+                <View
+                  className={twMerge(
+                    'flex-row items-center gap-2 p-4',
+                    isSelected && 'bg-primary',
+                  )}
+                >
+                  {isSelected && (
+                    <MaterialIcons
+                      name="check"
+                      size={15}
+                      color={
+                        themeColors['--color-primary-contrast-text']
+                      }
+                    />
+                  )}
+                  <Text
+                    className={twMerge(
+                      isSelected && 'text-primary-contrast-text',
+                    )}
+                  >
+                    {item.label}
+                  </Text>
                 </View>
               </TouchableOpacity>
             );

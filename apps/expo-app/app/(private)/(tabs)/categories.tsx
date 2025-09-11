@@ -1,4 +1,5 @@
 import { MaterialIcons } from '@expo/vector-icons';
+import { type EditCategoryDto } from '@packages/data-transfer-objects/dtos';
 import { FlatList, RefreshControl, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Button from '../../../components/button';
@@ -39,7 +40,7 @@ export default function CategoriesTab () {
         }
         data={data || []}
         renderItem={({ item }) => {
-          const { id, name, description } = item;
+          const { id, name, description, organizationId } = item;
 
           return (
             <View
@@ -62,10 +63,11 @@ export default function CategoriesTab () {
                   href={{
                     pathname: '/edit-category',
                     params: {
-                      id: item.id,
-                      description: item.description,
-                      name: item.name,
-                    },
+                      id,
+                      description: description ?? '',
+                      name,
+                      organizationId,
+                    } satisfies EditCategoryDto,
                   }}
                 />
               </View>

@@ -8,20 +8,18 @@ import { useForm } from 'react-hook-form';
 import { View } from 'react-native';
 import FormSubmitButton from '../../components/forms/submit-button';
 import FormTextInput from '../../components/forms/text-input';
-import { useAuthContext } from '../../contexts/auth';
 import { alertMessage, alertUknownError } from '../../utils/alerts';
 import { trpc } from '../../utils/trpc';
 
-export default function EditCategory() {
-  const { id, name, description } =
+export default function EditCategory () {
+  const { id, name, description, organizationId } =
     useLocalSearchParams<EditCategoryDto>();
   const router = useRouter();
-  const { activeOrganization } = useAuthContext(true);
 
   const { control, handleSubmit } = useForm({
     resolver: zodResolver(editCategoryDto),
     values: {
-      organizationId: activeOrganization.id,
+      organizationId,
       id,
       name,
       description,
@@ -35,7 +33,7 @@ export default function EditCategory() {
     try {
       await mutateAsync(data);
       router.dismissAll();
-      alertMessage('Category edited successfully');
+      alertMessage('Category updated successfully');
     } catch (error) {
       console.log(error);
       // @todo log to sentry?

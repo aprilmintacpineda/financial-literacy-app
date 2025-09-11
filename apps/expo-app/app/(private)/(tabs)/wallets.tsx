@@ -1,4 +1,5 @@
 import { MaterialIcons } from '@expo/vector-icons';
+import { type EditWalletDto } from '@packages/data-transfer-objects/dtos';
 import { FlatList, RefreshControl, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Button from '../../../components/button';
@@ -39,7 +40,14 @@ export default function WalletsTab () {
         }
         data={data || []}
         renderItem={({ item }) => {
-          const { amount, name, currency, walletType, id } = item;
+          const {
+            amount,
+            name,
+            currency,
+            walletType,
+            id,
+            organizationId,
+          } = item;
 
           return (
             <View
@@ -67,7 +75,8 @@ export default function WalletsTab () {
                     params: {
                       id,
                       name,
-                    },
+                      organizationId,
+                    } satisfies EditWalletDto,
                   }}
                 />
               </View>

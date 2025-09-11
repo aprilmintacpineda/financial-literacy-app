@@ -1,4 +1,5 @@
 import { MaterialIcons } from '@expo/vector-icons';
+import { type EditTagDto } from '@packages/data-transfer-objects/dtos';
 import { FlatList, RefreshControl, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Button from '../../../components/button';
@@ -37,7 +38,7 @@ export default function TagsTab () {
         }
         data={data || []}
         renderItem={({ item }) => {
-          const { id, name, description } = item;
+          const { id, name, description, organizationId } = item;
 
           return (
             <View
@@ -62,8 +63,9 @@ export default function TagsTab () {
                     params: {
                       id,
                       name,
-                      description,
-                    },
+                      description: description ?? '',
+                      organizationId,
+                    } satisfies EditTagDto,
                   }}
                 />
               </View>

@@ -27,10 +27,10 @@ const transactionTypeOptions = supportedTransactionTypes.map(
       label: value,
       value,
     };
-  }
+  },
 );
 
-export default function AddTransaction() {
+export default function AddTransaction () {
   const { activeOrganization } = useAuthContext(true);
   const router = useRouter();
 
@@ -56,8 +56,6 @@ export default function AddTransaction() {
 
   const onSubmit = handleSubmit(async data => {
     try {
-      console.log('submitting', JSON.stringify(data, null, 4));
-
       await mutateAsync(data);
       router.dismissAll();
       alertMessage('Transaction added successfully');

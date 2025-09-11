@@ -31,7 +31,7 @@ const resendEmailVerificationMutation = protectedProcedure.mutation(
       to: ctx.user.email,
       name: ctx.user.name,
     });
-  }
+  },
 );
 
 export default resendEmailVerificationMutation;

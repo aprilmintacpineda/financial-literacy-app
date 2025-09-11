@@ -4,7 +4,7 @@ import {
 } from '@aws-sdk/client-sesv2';
 import env from '../env';
 
-export function sendEmail({
+export function sendEmail ({
   to,
   body,
   subject,

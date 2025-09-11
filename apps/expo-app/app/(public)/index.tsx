@@ -11,7 +11,7 @@ import { useAuthContext } from '../../contexts/auth';
 import { alertMessage, alertUknownError } from '../../utils/alerts';
 import { trpc, type tTRPCClientError } from '../../utils/trpc';
 
-export default function HomeScreen() {
+export default function HomeScreen () {
   const { mutateAsync } = trpc.signInMutation.useMutation();
   const { login, isLoggedIn } = useAuthContext();
   const router = useRouter();

@@ -13,7 +13,7 @@ import { useAuthContext } from '../../contexts/auth';
 import { alertMessage, alertUknownError } from '../../utils/alerts';
 import { trpc, type tTRPCClientError } from '../../utils/trpc';
 
-export default function VerifyEmail() {
+export default function VerifyEmail () {
   const router = useRouter();
   const { publicUserData, setUserData } = useAuthContext(true);
   const { control, handleSubmit, reset } = useForm({
@@ -45,7 +45,7 @@ export default function VerifyEmail() {
         alertMessage('You have reached the maximum attempts.');
       } else if (error.data?.code === 'CONFLICT') {
         alertMessage(
-          'Your email is already verified. Please try to close and reopen the app.'
+          'Your email is already verified. Please try to close and reopen the app.',
         );
       } else {
         // @todo log to sentry?
@@ -63,7 +63,7 @@ export default function VerifyEmail() {
           publicUserData: {
             ...publicUserData!,
             emailVerificationCodeCanSentAt: new Date(
-              Date.now() + 2 * 60 * 1000
+              Date.now() + 2 * 60 * 1000,
             ),
           },
           activeOrganization: activeOrganization!,

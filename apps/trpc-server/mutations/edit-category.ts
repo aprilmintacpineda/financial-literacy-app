@@ -8,14 +8,14 @@ const editCategoryMutation = verifiedUserProcedure
   .mutation(async ({ input }) => {
     const category = await CategoriesRepository.getCategoryById(
       input.organizationId,
-      input.id
+      input.id,
     );
 
     if (!category) throw new TRPCError({ code: 'NOT_FOUND' });
 
     await CategoriesRepository.editCategory(
       category.organizationId,
-      input
+      input,
     );
   });
 

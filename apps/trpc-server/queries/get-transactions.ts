@@ -6,12 +6,12 @@ const getTransactionsQuery = verifiedUserProcedure
   .input(
     z.object({
       organizationId: z.string(),
-    })
+    }),
   )
   .query(async ({ input }) => {
     const transactions =
       await TransactionsRepository.getAllTransactions(
-        input.organizationId
+        input.organizationId,
       );
 
     return transactions.map(transaction => transaction.publicData);

@@ -6,11 +6,11 @@ const getWalletsQuery = verifiedUserProcedure
   .input(
     z.object({
       organizationId: z.string(),
-    })
+    }),
   )
   .query(async ({ input }) => {
     const wallets = await WalletsRepository.getAllWallets(
-      input.organizationId
+      input.organizationId,
     );
 
     return wallets.map(wallet => wallet.publicData);

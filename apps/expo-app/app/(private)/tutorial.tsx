@@ -1,6 +1,6 @@
 import { ScrollView, Text, View } from 'react-native';
 
-export default function Tutorial() {
+export default function Tutorial () {
   return (
     <ScrollView>
       <View className="mb-10 p-4">

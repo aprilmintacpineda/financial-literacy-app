@@ -9,15 +9,15 @@ import { WalletModel } from '../models';
 import { omit } from '../utils/data-manipulation';
 import { uniqueId } from '../utils/generators';
 
-function mapResultToModel(result: Wallets) {
+function mapResultToModel (result: Wallets) {
   const walletData = omit(result, ['deletedAt']);
   return new WalletModel(walletData);
 }
 
 export class WalletsRepository {
-  static async createWallet(
+  static async createWallet (
     values: AddWalletDto,
-    trx?: Transaction<DB>
+    trx?: Transaction<DB>,
   ) {
     const connection = trx ?? database;
     const now = new Date();
@@ -36,7 +36,7 @@ export class WalletsRepository {
     return id;
   }
 
-  static async getAllWallets(organizationId: string) {
+  static async getAllWallets (organizationId: string) {
     const wallets = await database
       .selectFrom('wallets')
       .selectAll()
@@ -44,14 +44,14 @@ export class WalletsRepository {
         eb.and([
           eb('organizationId', '=', organizationId),
           eb('deletedAt', 'is', null),
-        ])
+        ]),
       )
       .execute();
 
     return wallets.map(mapResultToModel);
   }
 
-  static async getWalletById(organizationId: string, id: string) {
+  static async getWalletById (organizationId: string, id: string) {
     const wallet = await database
       .selectFrom('wallets')
       .selectAll()
@@ -60,7 +60,7 @@ export class WalletsRepository {
           eb('id', '=', id),
           eb('organizationId', '=', organizationId),
           eb('deletedAt', 'is', null),
-        ])
+        ]),
       )
       .executeTakeFirst();
 
@@ -69,10 +69,10 @@ export class WalletsRepository {
     return mapResultToModel(wallet);
   }
 
-  static async editWallet(
+  static async editWallet (
     organizationId: string,
     { id, ...values }: EditWalletDto,
-    trx?: Transaction<DB>
+    trx?: Transaction<DB>,
   ) {
     const connection = trx ?? database;
 
@@ -87,16 +87,16 @@ export class WalletsRepository {
           eb('id', '=', id),
           eb('organizationId', '=', organizationId),
           eb('deletedAt', 'is', null),
-        ])
+        ]),
       )
       .execute();
   }
 
-  static async updateAmount(
+  static async updateAmount (
     organizationId: string,
     id: string,
     amount: number,
-    trx?: Transaction<DB>
+    trx?: Transaction<DB>,
   ) {
     const connection = trx ?? database;
 
@@ -111,7 +111,7 @@ export class WalletsRepository {
           eb('organizationId', '=', organizationId),
           eb('id', '=', id),
           eb('deletedAt', 'is', null),
-        ])
+        ]),
       )
       .execute();
   }

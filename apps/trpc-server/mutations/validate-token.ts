@@ -9,7 +9,7 @@ const validateTokenMutation = verifiedUserProcedure.mutation(
       token,
       publicUserData: ctx.user.publicData,
     };
-  }
+  },
 );
 
 export default validateTokenMutation;

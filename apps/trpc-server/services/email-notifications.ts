@@ -1,13 +1,13 @@
 import { sendEmail } from '../utils/s3';
 
-function composeBody(message: string[]) {
+function composeBody (message: string[]) {
   return [
     ...message,
     '<p>Best regards,<br/>The Cash Tracker App Team</p>',
   ].join('');
 }
 
-export async function sendWelcomeEmail({
+export async function sendWelcomeEmail ({
   emailVerificationCode,
   to,
   name,
@@ -31,7 +31,7 @@ export async function sendWelcomeEmail({
   }
 }
 
-export async function resendEmailVerificationCode({
+export async function resendEmailVerificationCode ({
   emailVerificationCode,
   to,
   name,
@@ -55,7 +55,7 @@ export async function resendEmailVerificationCode({
   }
 }
 
-export async function changedPasswordEmail({
+export async function changedPasswordEmail ({
   to,
   name,
 }: {
@@ -76,7 +76,7 @@ export async function changedPasswordEmail({
   }
 }
 
-export async function sendChangePasswordVerificationEmail({
+export async function sendChangePasswordVerificationEmail ({
   to,
   name,
   changePasswordVerificationCode,
@@ -98,7 +98,7 @@ export async function sendChangePasswordVerificationEmail({
   } catch (error) {
     console.log(
       'Error sending change password verification code:',
-      error
+      error,
     );
   }
 }

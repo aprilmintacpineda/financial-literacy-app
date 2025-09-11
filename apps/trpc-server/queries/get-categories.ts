@@ -6,11 +6,11 @@ const getCategoriesQuery = verifiedUserProcedure
   .input(
     z.object({
       organizationId: z.string(),
-    })
+    }),
   )
   .query(async ({ input }) => {
     const categories = await CategoriesRepository.getAllCategories(
-      input.organizationId
+      input.organizationId,
     );
 
     return categories.map(category => category.publicData);

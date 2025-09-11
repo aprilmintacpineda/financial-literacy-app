@@ -8,29 +8,29 @@ export class UserModel implements Omit<Users, 'deletedAt'> {
     organizations: OrganizationModel[];
   };
 
-  constructor(
+  constructor (
     user: Omit<Users, 'deletedAt'>,
-    organizations: Omit<Organizations, 'deletedAt'>[]
+    organizations: Omit<Organizations, 'deletedAt'>[],
   ) {
     this.data = {
       ...user,
       organizations: organizations.map(
-        organization => new OrganizationModel(organization)
+        organization => new OrganizationModel(organization),
       ),
     };
   }
 
-  isPasswordCorrect(password: string) {
+  isPasswordCorrect (password: string) {
     return bcrypt.compare(password, this.data.password);
   }
 
-  isPartOfOrganization(organizationId: string) {
+  isPartOfOrganization (organizationId: string) {
     return this.data.organizations.some(
-      organization => organization.id === organizationId
+      organization => organization.id === organizationId,
     );
   }
 
-  get publicData() {
+  get publicData () {
     const publicData = omit(this.data, [
       'password',
       'organizations',
@@ -48,72 +48,72 @@ export class UserModel implements Omit<Users, 'deletedAt'> {
       ...publicData,
       isEmailVerified: Boolean(this.emailVerifiedAt),
       organizations: this.organizations.map(
-        organization => organization.publicData
+        organization => organization.publicData,
       ),
     };
   }
 
-  get id() {
+  get id () {
     return this.data.id;
   }
 
-  get emailVerificationCodeCanSentAt() {
+  get emailVerificationCodeCanSentAt () {
     return this.data.emailVerificationCodeCanSentAt;
   }
 
-  get emailVerificationCode() {
+  get emailVerificationCode () {
     return this.data.emailVerificationCode;
   }
 
-  get emailVerificationCodeExpiresAt() {
+  get emailVerificationCodeExpiresAt () {
     return this.data.emailVerificationCodeExpiresAt;
   }
 
-  get emailVerificationCodeTries() {
+  get emailVerificationCodeTries () {
     return this.data.emailVerificationCodeTries;
   }
 
-  get emailVerifiedAt() {
+  get emailVerifiedAt () {
     return this.data.emailVerifiedAt;
   }
 
-  get email() {
+  get email () {
     return this.data.email;
   }
 
-  get name() {
+  get name () {
     return this.data.name;
   }
 
-  get password() {
+  get password () {
     return this.data.password;
   }
 
-  get createdAt() {
+  get createdAt () {
     return this.data.createdAt;
   }
 
-  get updatedAt() {
+  get updatedAt () {
     return this.data.updatedAt;
   }
 
-  get organizations() {
+  get organizations () {
     return this.data.organizations;
   }
 
-  get changePasswordVerificationCodeCanSentAt() {
+  get changePasswordVerificationCodeCanSentAt () {
     return this.data.changePasswordVerificationCodeCanSentAt;
   }
 
-  get changePasswordVerificationCode() {
+  get changePasswordVerificationCode () {
     return this.data.changePasswordVerificationCode;
   }
 
-  get changePasswordVerificationCodeExpiresAt() {
+  get changePasswordVerificationCodeExpiresAt () {
     return this.data.changePasswordVerificationCodeExpiresAt;
   }
 
-  get changePasswordVerificationCodeTries() {
+  get changePasswordVerificationCodeTries () {
     return this.data.changePasswordVerificationCodeTries;
   }
 }

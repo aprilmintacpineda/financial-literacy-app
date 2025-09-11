@@ -17,14 +17,14 @@ const editTransactionMutation = verifiedUserProcedure
     const [inputWallet, category, ...tags] = await Promise.all([
       WalletsRepository.getWalletById(
         input.organizationId,
-        input.walletId
+        input.walletId,
       ),
       CategoriesRepository.getCategoryById(
         input.organizationId,
-        input.categoryId
+        input.categoryId,
       ),
       ...tagIds.map(tagId =>
-        TagsRepository.getTagById(input.organizationId, tagId)
+        TagsRepository.getTagById(input.organizationId, tagId),
       ),
     ]);
 
@@ -34,7 +34,7 @@ const editTransactionMutation = verifiedUserProcedure
     const originalTransaction =
       await TransactionsRepository.getTransactionById(
         input.organizationId,
-        input.id
+        input.id,
       );
 
     await database.transaction().execute(async trx => {
@@ -46,7 +46,7 @@ const editTransactionMutation = verifiedUserProcedure
         const originalWallet =
           (await WalletsRepository.getWalletById(
             input.organizationId,
-            originalTransaction.walletId
+            originalTransaction.walletId,
           ))!;
 
         const originalWalletRevertedAmount =
@@ -59,8 +59,8 @@ const editTransactionMutation = verifiedUserProcedure
             input.organizationId,
             originalWallet.id,
             originalWalletRevertedAmount,
-            trx
-          )
+            trx,
+          ),
         );
 
         // then recalculate what the amount would be for the new wallet
@@ -74,8 +74,8 @@ const editTransactionMutation = verifiedUserProcedure
             input.organizationId,
             inputWallet.id,
             newAmount,
-            trx
-          )
+            trx,
+          ),
         );
       } else {
         // we need to first revert the wallet amount to prior this transaction
@@ -94,8 +94,8 @@ const editTransactionMutation = verifiedUserProcedure
             input.organizationId,
             inputWallet.id,
             newAmount,
-            trx
-          )
+            trx,
+          ),
         );
       }
 
@@ -106,8 +106,8 @@ const editTransactionMutation = verifiedUserProcedure
             TransactionTagsRepository.deleteTransactionTag(
               originalTransaction.id,
               originalTag.id,
-              trx
-            )
+              trx,
+            ),
           );
         }
       });
@@ -116,7 +116,7 @@ const editTransactionMutation = verifiedUserProcedure
       tagIds.forEach(tagId => {
         if (
           !originalTransaction.tags.find(
-            originalTag => originalTag.id === tagId
+            originalTag => originalTag.id === tagId,
           )
         ) {
           promises.push(
@@ -125,8 +125,8 @@ const editTransactionMutation = verifiedUserProcedure
                 tagId,
                 transactionId: originalTransaction.id,
               },
-              trx
-            )
+              trx,
+            ),
           );
         }
       });
@@ -135,8 +135,8 @@ const editTransactionMutation = verifiedUserProcedure
         TransactionsRepository.editTransaction(
           input.organizationId,
           input,
-          trx
-        )
+          trx,
+        ),
       );
 
       await allFulfilledOrThrow(promises);

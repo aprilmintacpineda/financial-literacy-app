@@ -30,7 +30,7 @@ const changePasswordMutation = protectedProcedure
 
     await UsersRepository.changePassword(
       ctx.user.id,
-      input.newPassword
+      input.newPassword,
     );
 
     // let hang intentionally to allow faster response

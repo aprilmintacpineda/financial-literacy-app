@@ -6,7 +6,7 @@ import { twMerge } from 'tailwind-merge';
 import { useAuthContext } from '../../../contexts/auth';
 import { useThemeColors } from '../../../themes';
 
-export default function AccountTab() {
+export default function AccountTab () {
   const themeColors = useThemeColors();
   const { publicUserData, activeOrganization } =
     useAuthContext(true);
@@ -46,7 +46,7 @@ export default function AccountTab() {
               <View
                 className={twMerge(
                   'flex-row items-center gap-2 p-5',
-                  isActiveOrg ? 'bg-primary' : ''
+                  isActiveOrg ? 'bg-primary' : '',
                 )}
               >
                 {isActiveOrg && (
@@ -60,7 +60,7 @@ export default function AccountTab() {
                 )}
                 <Text
                   className={twMerge(
-                    isActiveOrg ? 'text-primary-contrast-text' : ''
+                    isActiveOrg ? 'text-primary-contrast-text' : '',
                   )}
                 >
                   {organization.name}

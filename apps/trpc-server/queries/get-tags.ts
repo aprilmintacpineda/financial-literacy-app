@@ -6,11 +6,11 @@ const getTagsQuery = verifiedUserProcedure
   .input(
     z.object({
       organizationId: z.string(),
-    })
+    }),
   )
   .query(async ({ input }) => {
     const tags = await TagsRepository.getAllTags(
-      input.organizationId
+      input.organizationId,
     );
 
     return tags.map(tag => tag.publicData);

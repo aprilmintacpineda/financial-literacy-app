@@ -8,7 +8,7 @@ const editWalletMutation = verifiedUserProcedure
   .mutation(async ({ input }) => {
     const wallet = await WalletsRepository.getWalletById(
       input.organizationId,
-      input.id
+      input.id,
     );
 
     if (!wallet) throw new TRPCError({ code: 'NOT_FOUND' });

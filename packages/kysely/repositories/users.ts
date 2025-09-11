@@ -15,7 +15,7 @@ import {
   getEmailVerificationCodeExpiresAt,
 } from '../utils/time';
 
-function mapSingleUserToModel(
+function mapSingleUserToModel (
   results: {
     userId: Users['id'];
     userEmail: Users['email'];
@@ -36,7 +36,7 @@ function mapSingleUserToModel(
     organizationName: Organizations['name'];
     organizationCreatedAt: Organizations['createdAt'];
     organizationUpdatedAt: Organizations['updatedAt'];
-  }[]
+  }[],
 ) {
   if (!results.length) return null;
 
@@ -72,27 +72,27 @@ function mapSingleUserToModel(
         createdAt: result.organizationCreatedAt,
         updatedAt: result.organizationUpdatedAt,
       };
-    })
+    }),
   );
 }
 
 export class UsersRepository {
-  static async getUserByEmail(email: string) {
+  static async getUserByEmail (email: string) {
     const result = await database
       .selectFrom('users')
       .innerJoin(
         'organization_users',
         'users.id',
-        'organization_users.userId'
+        'organization_users.userId',
       )
       .innerJoin('organizations', join =>
         join
           .onRef(
             'organizations.id',
             '=',
-            'organization_users.organizationId'
+            'organization_users.organizationId',
           )
-          .on('organizations.deletedAt', 'is', null)
+          .on('organizations.deletedAt', 'is', null),
       )
       .select([
         'users.id as userId',
@@ -119,29 +119,29 @@ export class UsersRepository {
         eb.and([
           eb('users.email', '=', email),
           eb('users.deletedAt', 'is', null),
-        ])
+        ]),
       )
       .execute();
 
     return mapSingleUserToModel(result);
   }
 
-  static async getUserById(userId: string) {
+  static async getUserById (userId: string) {
     const results = await database
       .selectFrom('users')
       .innerJoin(
         'organization_users',
         'users.id',
-        'organization_users.userId'
+        'organization_users.userId',
       )
       .innerJoin('organizations', join =>
         join
           .onRef(
             'organizations.id',
             '=',
-            'organization_users.organizationId'
+            'organization_users.organizationId',
           )
-          .on('organizations.deletedAt', 'is', null)
+          .on('organizations.deletedAt', 'is', null),
       )
       .select([
         'users.id as userId',
@@ -168,21 +168,21 @@ export class UsersRepository {
         eb.and([
           eb('users.id', '=', userId),
           eb('users.deletedAt', 'is', null),
-        ])
+        ]),
       )
       .execute();
 
     return mapSingleUserToModel(results);
   }
 
-  static async createUser(
+  static async createUser (
     {
       email,
       name,
       password,
       emailVerificationCode,
     }: SignUpDto & { emailVerificationCode: string },
-    trx?: Transaction<DB>
+    trx?: Transaction<DB>,
   ) {
     const connection = trx ?? database;
 
@@ -239,7 +239,7 @@ export class UsersRepository {
     return userId;
   }
 
-  static async updateUser(
+  static async updateUser (
     {
       id,
       ...input
@@ -261,7 +261,7 @@ export class UsersRepository {
           | 'changePasswordVerificationCodeCanSentAt'
         >
       >,
-    trx?: Transaction<DB>
+    trx?: Transaction<DB>,
   ) {
     const connection = trx ?? database;
 
@@ -272,15 +272,15 @@ export class UsersRepository {
         updatedAt: new Date(),
       })
       .where(eb =>
-        eb.and([eb('id', '=', id), eb('deletedAt', 'is', null)])
+        eb.and([eb('id', '=', id), eb('deletedAt', 'is', null)]),
       )
       .execute();
   }
 
-  static async changePassword(
+  static async changePassword (
     id: string,
     newPassword: string,
-    trx?: Transaction<DB>
+    trx?: Transaction<DB>,
   ) {
     const connection = trx ?? database;
     const hashedPassword = await bcrypt.hash(newPassword, 12);
@@ -297,7 +297,7 @@ export class UsersRepository {
         updatedAt: now,
       })
       .where(eb =>
-        eb.and([eb('id', '=', id), eb('deletedAt', 'is', null)])
+        eb.and([eb('id', '=', id), eb('deletedAt', 'is', null)]),
       )
       .execute();
   }

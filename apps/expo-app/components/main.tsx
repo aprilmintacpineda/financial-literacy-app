@@ -18,7 +18,7 @@ import Routes from './routes';
 
 SplashScreen.preventAutoHideAsync();
 
-export default function Main() {
+export default function Main () {
   const queryClient = useMemo(
     () =>
       new QueryClient({
@@ -31,7 +31,7 @@ export default function Main() {
           },
         },
       }),
-    []
+    [],
   );
 
   const { token, status } = useAuthContext();

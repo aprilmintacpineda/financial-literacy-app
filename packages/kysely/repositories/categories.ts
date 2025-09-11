@@ -9,14 +9,14 @@ import { CategoryModel } from '../models';
 import { omit } from '../utils/data-manipulation';
 import { uniqueId } from '../utils/generators';
 
-function mapResultsToModel(result: Categories) {
+function mapResultsToModel (result: Categories) {
   return new CategoryModel(omit(result, ['deletedAt']));
 }
 
 export class CategoriesRepository {
-  static async createCategory(
+  static async createCategory (
     values: AddCategoryDto,
-    trx?: Transaction<DB>
+    trx?: Transaction<DB>,
   ) {
     const connection = trx ?? database;
     const now = new Date();
@@ -35,10 +35,10 @@ export class CategoriesRepository {
     return id;
   }
 
-  static async editCategory(
+  static async editCategory (
     organizationId: string,
     { id, ...values }: EditCategoryDto,
-    trx?: Transaction<DB>
+    trx?: Transaction<DB>,
   ) {
     const connection = trx ?? database;
 
@@ -53,12 +53,12 @@ export class CategoriesRepository {
           eb('id', '=', id),
           eb('deletedAt', 'is', null),
           eb('organizationId', '=', organizationId),
-        ])
+        ]),
       )
       .execute();
   }
 
-  static async getAllCategories(organizationId: string) {
+  static async getAllCategories (organizationId: string) {
     const result = await database
       .selectFrom('categories')
       .selectAll()
@@ -66,14 +66,14 @@ export class CategoriesRepository {
         eb.and([
           eb('organizationId', '=', organizationId),
           eb('deletedAt', 'is', null),
-        ])
+        ]),
       )
       .execute();
 
     return result.map(mapResultsToModel);
   }
 
-  static async getCategoryById(organizationId: string, id: string) {
+  static async getCategoryById (organizationId: string, id: string) {
     const category = await database
       .selectFrom('categories')
       .selectAll()
@@ -82,7 +82,7 @@ export class CategoriesRepository {
           eb('id', '=', id),
           eb('organizationId', '=', organizationId),
           eb('deletedAt', 'is', null),
-        ])
+        ]),
       )
       .executeTakeFirst();
 

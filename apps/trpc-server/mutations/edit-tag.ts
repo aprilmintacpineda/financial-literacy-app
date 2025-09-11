@@ -8,7 +8,7 @@ const editTagMutation = verifiedUserProcedure
   .mutation(async ({ input }) => {
     const tag = await TagsRepository.getTagById(
       input.organizationId,
-      input.id
+      input.id,
     );
 
     if (!tag) throw new TRPCError({ code: 'NOT_FOUND' });

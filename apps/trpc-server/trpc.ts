@@ -15,7 +15,7 @@ export const protectedProcedure = trpc.procedure
       .object({
         organizationId: z.string().optional(),
       })
-      .optional()
+      .optional(),
   )
   .use(async ({ ctx, input, next }) => {
     if (!ctx.user) throw new TRPCError({ code: 'UNAUTHORIZED' });
@@ -43,5 +43,5 @@ export const verifiedUserProcedure = protectedProcedure.use(
         user: ctx.user,
       },
     });
-  }
+  },
 );

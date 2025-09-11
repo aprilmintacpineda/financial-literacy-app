@@ -26,7 +26,7 @@ const walletTypeOptions = [
   },
 ];
 
-export default function AddWallet() {
+export default function AddWallet () {
   const { activeOrganization } = useAuthContext(true);
   const router = useRouter();
 

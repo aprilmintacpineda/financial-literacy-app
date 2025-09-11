@@ -63,7 +63,7 @@ export default function TagsTab () {
                     params: {
                       id,
                       name,
-                      description: description ?? '',
+                      description,
                       organizationId,
                     } satisfies EditTagDto,
                   }}

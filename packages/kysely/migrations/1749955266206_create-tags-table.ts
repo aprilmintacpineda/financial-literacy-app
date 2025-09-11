@@ -8,7 +8,7 @@ export async function up (db: Kysely<any>): Promise<void> {
     .addColumn('id', cuid, col => col.primaryKey().notNull())
     .addColumn('organizationId', cuid, col => col.notNull())
     .addColumn('name', names, col => col.notNull())
-    .addColumn('description', 'varchar(255)')
+    .addColumn('description', 'varchar(255)', col => col.notNull())
     .execute();
 
   await db.schema

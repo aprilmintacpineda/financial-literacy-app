@@ -64,7 +64,7 @@ export default function CategoriesTab () {
                     pathname: '/edit-category',
                     params: {
                       id,
-                      description: description ?? '',
+                      description,
                       name,
                       organizationId,
                     } satisfies EditCategoryDto,

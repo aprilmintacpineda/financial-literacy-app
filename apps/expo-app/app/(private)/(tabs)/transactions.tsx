@@ -127,7 +127,7 @@ export default function TransactionsTab () {
                     params: {
                       amount: amount.toString(),
                       currency,
-                      description: description ?? '',
+                      description,
                       transactionDate: transactionDate.toISOString(),
                       categoryId: category.id,
                       organizationId,
@@ -139,9 +139,11 @@ export default function TransactionsTab () {
                   }}
                 />
               </View>
-              <Text className="text-sm" numberOfLines={1}>
-                {description}
-              </Text>
+              {description && (
+                <Text className="text-sm" numberOfLines={1}>
+                  {description}
+                </Text>
+              )}
               <Text className="text-sm" numberOfLines={1}>
                 {wallet.name} | {category.name}
               </Text>

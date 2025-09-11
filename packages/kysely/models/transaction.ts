@@ -9,19 +9,18 @@ import { TagModel } from './tag';
 import { WalletModel } from './wallet';
 
 export class TransactionModel
-  implements Omit<Transactions, 'deletedAt'>
-{
+  implements Omit<Transactions, 'deletedAt'> {
   private data: Omit<Transactions, 'deletedAt'> & {
     category: CategoryModel;
     wallet: WalletModel;
     tags: TagModel[];
   };
 
-  constructor(
+  constructor (
     transaction: Omit<Transactions, 'deletedAt'>,
     category: Omit<Categories, 'deletedAt'>,
     wallet: Omit<Wallets, 'deletedAt'>,
-    tags: Omit<Tags, 'deletedAt'>[]
+    tags: Omit<Tags, 'deletedAt'>[],
   ) {
     this.data = {
       ...transaction,
@@ -31,7 +30,7 @@ export class TransactionModel
     };
   }
 
-  get publicData() {
+  get publicData () {
     return {
       ...this.data,
       category: this.data.category.publicData,
@@ -40,47 +39,51 @@ export class TransactionModel
     };
   }
 
-  get id() {
+  get id () {
     return this.data.id;
   }
 
-  get amount() {
+  get amount () {
     return this.data.amount;
   }
 
-  get currency() {
+  get currency () {
     return this.data.currency;
   }
 
-  get categoryId() {
+  get categoryId () {
     return this.data.categoryId;
   }
 
-  get description() {
+  get description () {
     return this.data.description;
   }
 
-  get transactionDate() {
+  get transactionDate () {
     return this.data.transactionDate;
   }
 
-  get transactionType() {
+  get transactionType () {
     return this.data.transactionType;
   }
 
-  get walletId() {
+  get walletId () {
     return this.data.walletId;
   }
 
-  get organizationId() {
+  get organizationId () {
     return this.data.organizationId;
   }
 
-  get createdAt() {
+  get createdAt () {
     return this.data.createdAt;
   }
 
-  get updatedAt() {
+  get updatedAt () {
     return this.data.updatedAt;
+  }
+
+  get tags () {
+    return this.data.tags;
   }
 }

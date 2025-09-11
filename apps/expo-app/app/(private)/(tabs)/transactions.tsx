@@ -1,4 +1,5 @@
 import { MaterialIcons } from '@expo/vector-icons';
+import { type EditTransactionDto } from '@packages/data-transfer-objects/dtos';
 import { Link } from 'expo-router';
 import { FlatList, RefreshControl, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -7,7 +8,17 @@ import Button from '../../../components/button';
 import { useAuthContext } from '../../../contexts/auth';
 import { trpc } from '../../../utils/trpc';
 
-export default function TransactionsTab() {
+export type EditTransactionParam = Omit<
+  EditTransactionDto,
+  'transactionDate' | 'tagIds' | 'description' | 'amount'
+> & {
+  transactionDate: string;
+  tagIds: string;
+  description: string;
+  amount: string;
+};
+
+export default function TransactionsTab () {
   const { activeOrganization } = useAuthContext(true);
 
   const { refetch, data, status, isRefetching } =
@@ -70,6 +81,7 @@ export default function TransactionsTab() {
             tags,
             transactionDate,
             transactionType,
+            organizationId,
           },
         }) => {
           const isExpense = transactionType === 'Expense';
@@ -81,21 +93,24 @@ export default function TransactionsTab() {
             >
               <View className="flex-row items-center justify-between">
                 <View className="flex-row items-center gap-2">
-                  <Text className="text-xl font-medium">
+                  <Text
+                    className={twMerge(
+                      'text-xl font-medium',
+                      isExpense
+                        ? 'text-error-text'
+                        : 'text-success-text',
+                    )}
+                  >
+                    {isExpense ? '-' : '+'}
                     {new Intl.NumberFormat(undefined, {
                       currency: currency,
                       style: 'currency',
-                    }).format(isExpense ? -amount : amount)}
+                    }).format(amount)}
                   </Text>
-                  <Text
-                    className={twMerge(
-                      'text-sm text-disabled-text',
-                      isExpense
-                        ? 'text-error-text'
-                        : 'text-success-text'
-                    )}
-                  >
-                    {transactionType}
+                  <Text className="text-sm text-disabled-text">
+                    {new Intl.DateTimeFormat(undefined, {
+                      dateStyle: 'medium',
+                    }).format(transactionDate)}
                   </Text>
                 </View>
                 <Button
@@ -107,6 +122,21 @@ export default function TransactionsTab() {
                     />
                   }
                   className="rounded-full p-2"
+                  href={{
+                    pathname: '/edit-transaction',
+                    params: {
+                      amount: amount.toString(),
+                      currency,
+                      description: description ?? '',
+                      transactionDate: transactionDate.toISOString(),
+                      categoryId: category.id,
+                      organizationId,
+                      tagIds: tags.map(tag => tag.id).join(','),
+                      id,
+                      transactionType,
+                      walletId: wallet.id,
+                    } satisfies EditTransactionParam,
+                  }}
                 />
               </View>
               <Text className="text-sm" numberOfLines={1}>

@@ -22,7 +22,7 @@ const NumberInput = ({
   maxDecimalDigits = 5,
   ...textInputProps
 }: tNumberInputProps) => {
-  const [input, setInput] = useState('');
+  const [input, setInput] = useState(String(value));
 
   const onChangeText = useCallback((value: string) => {
     const [whole, decimal] = value.split('.');

@@ -1,9 +1,4 @@
-import {
-  Duration,
-  Instant,
-  LocalDateTime,
-  ZoneId,
-} from '@js-joda/core';
+import { Duration, LocalDateTime, nativeJs } from '@js-joda/core';
 import { type ComponentProps, useEffect, useState } from 'react';
 import Button from './button';
 
@@ -12,10 +7,7 @@ function secondsLeft (targetDate?: Date | null) {
 
   const duration = Duration.between(
     LocalDateTime.now(),
-    LocalDateTime.ofInstant(
-      Instant.ofEpochMilli(targetDate.getTime()),
-      ZoneId.systemDefault(),
-    ),
+    LocalDateTime.from(nativeJs(targetDate)),
   );
 
   return duration.seconds();

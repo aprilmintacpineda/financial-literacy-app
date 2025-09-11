@@ -5,6 +5,7 @@ export * from './add-wallet';
 export * from './change-password';
 export * from './edit-category';
 export * from './edit-tag';
+export * from './edit-transaction';
 export * from './edit-wallet';
 export * from './sign-in';
 export * from './sign-up';

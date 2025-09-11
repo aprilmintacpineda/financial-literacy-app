@@ -6,6 +6,7 @@ import changePasswordMutation from './mutations/change-password';
 import changePasswordSendVerificationCodeMutation from './mutations/change-password-send-code';
 import editCategoryMutation from './mutations/edit-category';
 import editTagMutation from './mutations/edit-tag';
+import editTransactionMutation from './mutations/edit-transaction';
 import editWalletMutation from './mutations/edit-wallet';
 import resendEmailVerificationMutation from './mutations/resend-email-verification-code';
 import signInMutation from './mutations/sign-in';
@@ -48,4 +49,5 @@ export const appRouter = trpc.router({
 
   // transactions
   addTransactionMutation,
+  editTransactionMutation,
 });

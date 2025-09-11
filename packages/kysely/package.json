@@ -47,7 +47,8 @@
   },
   "exports": {
     "./repositories": "./repositories/index.ts",
-    "./models": "./models/index.ts"
+    "./models": "./models/index.ts",
+    ".": "./database.ts"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx,css,scss,html,json,md,yml,yaml}": [

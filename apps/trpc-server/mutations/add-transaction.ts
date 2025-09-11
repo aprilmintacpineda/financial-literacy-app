@@ -1,4 +1,5 @@
 import { addTransactionDto } from '@packages/data-transfer-objects/dtos';
+import { database } from '@packages/kysely';
 import {
   CategoriesRepository,
   TagsRepository,
@@ -7,8 +8,8 @@ import {
   WalletsRepository,
 } from '@packages/kysely/repositories';
 import { TRPCError } from '@trpc/server';
-import { database } from '../../../packages/kysely/database';
 import { verifiedUserProcedure } from '../trpc';
+import { allFulfilledOrThrow } from '../utils/promise';
 
 const addTransactionMutation = verifiedUserProcedure
   .input(addTransactionDto)
@@ -17,14 +18,14 @@ const addTransactionMutation = verifiedUserProcedure
     const [wallet, category, ...tags] = await Promise.all([
       WalletsRepository.getWalletById(
         input.organizationId,
-        input.walletId
+        input.walletId,
       ),
       CategoriesRepository.getCategoryById(
         input.organizationId,
-        input.categoryId
+        input.categoryId,
       ),
       ...tagIds.map(tagId =>
-        TagsRepository.getTagById(input.organizationId, tagId)
+        TagsRepository.getTagById(input.organizationId, tagId),
       ),
     ]);
 
@@ -42,19 +43,19 @@ const addTransactionMutation = verifiedUserProcedure
         input.organizationId,
         wallet.id,
         newAmount,
-        trx
+        trx,
       );
 
       const transactionId =
         await TransactionsRepository.createTransaction(input, trx);
 
-      await Promise.all(
+      await allFulfilledOrThrow(
         tagIds.map(tagId =>
           TransactionTagsRepository.createTransactionTag({
             transactionId,
             tagId,
-          })
-        )
+          }),
+        ),
       );
     });
   });

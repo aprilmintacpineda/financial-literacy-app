@@ -1,7 +1,7 @@
 import { Stack } from 'expo-router';
 import { useThemeColors } from '../../themes';
 
-export default function PrivateStackRoutes() {
+export default function PrivateStackRoutes () {
   const themeColors = useThemeColors();
 
   return (
@@ -94,6 +94,13 @@ export default function PrivateStackRoutes() {
         options={{
           presentation: 'modal',
           title: 'Add Transaction',
+        }}
+      />
+      <Stack.Screen
+        name="edit-transaction"
+        options={{
+          presentation: 'modal',
+          title: 'Edit Transaction',
         }}
       />
     </Stack>

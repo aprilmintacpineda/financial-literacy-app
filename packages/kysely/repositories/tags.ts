@@ -9,18 +9,18 @@ import { TagModel } from '../models';
 import { omit } from '../utils/data-manipulation';
 import { uniqueId } from '../utils/generators';
 
-function mapResultsToModel(result: Tags) {
+function mapResultsToModel (result: Tags) {
   const tagData = omit(result, ['deletedAt']);
   return new TagModel(tagData);
 }
 
 export class TagsRepository {
-  static async createTag(values: AddTagDto, trx?: Transaction<DB>) {
-    const connect = trx ?? database;
+  static async createTag (values: AddTagDto, trx?: Transaction<DB>) {
+    const connection = trx ?? database;
     const now = new Date();
     const id = uniqueId();
 
-    await connect
+    await connection
       .insertInto('tags')
       .values({
         ...values,
@@ -33,7 +33,7 @@ export class TagsRepository {
     return id;
   }
 
-  static async getAllTags(organizationId: string) {
+  static async getAllTags (organizationId: string) {
     const result = await database
       .selectFrom('tags')
       .selectAll()
@@ -41,14 +41,14 @@ export class TagsRepository {
         eb.and([
           eb('organizationId', '=', organizationId),
           eb('deletedAt', 'is', null),
-        ])
+        ]),
       )
       .execute();
 
     return result.map(mapResultsToModel);
   }
 
-  static async getTagById(organizationId: string, id: string) {
+  static async getTagById (organizationId: string, id: string) {
     const tag = await database
       .selectFrom('tags')
       .selectAll()
@@ -57,7 +57,7 @@ export class TagsRepository {
           eb('id', '=', id),
           eb('deletedAt', 'is', null),
           eb('organizationId', '=', organizationId),
-        ])
+        ]),
       )
       .executeTakeFirst();
 
@@ -66,14 +66,14 @@ export class TagsRepository {
     return mapResultsToModel(tag);
   }
 
-  static async editTag(
+  static async editTag (
     organizationId: string,
     { id, ...values }: EditTagDto,
-    trx?: Transaction<DB>
+    trx?: Transaction<DB>,
   ) {
-    const connect = trx ?? database;
+    const connection = trx ?? database;
 
-    await connect
+    await connection
       .updateTable('tags')
       .set({
         ...values,
@@ -84,7 +84,7 @@ export class TagsRepository {
           eb('id', '=', id),
           eb('deletedAt', 'is', null),
           eb('organizationId', '=', organizationId),
-        ])
+        ]),
       )
       .execute();
   }

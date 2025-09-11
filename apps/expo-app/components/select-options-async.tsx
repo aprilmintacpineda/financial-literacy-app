@@ -28,7 +28,7 @@ export default function SelectOptionsAsync<TData> ({
     <SelectOptions
       {...selectOptionsProps}
       mapValueToLabel={value => {
-        if (!value) return '';
+        if (!value || !options.length) return '';
         return options.find(option => option.value === value)!.label;
       }}
       options={options}

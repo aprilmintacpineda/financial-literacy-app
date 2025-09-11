@@ -28,6 +28,8 @@ export default function MultiSelectOptionsAsync<TData> ({
     <MultiSelectOptions
       {...selectOptionsProps}
       mapValuesToLabel={values => {
+        if (!options.length) return [];
+
         return values.reduce<string[]>((results, value) => {
           return results.concat(
             options.find(option => option.value === value)!.label,

@@ -16,9 +16,11 @@ export const addTransactionDto = z.object({
       invalid_type_error: 'Please select category from the list',
     })
     .nonempty('Please select category from the list'),
-  description: z.string({
-    invalid_type_error: 'Description must be a string',
-  }),
+  description: z
+    .string({
+      invalid_type_error: 'Description must be a string',
+    })
+    .max(255),
   amount: z
     .number({
       invalid_type_error: 'Initial amount must be a number',

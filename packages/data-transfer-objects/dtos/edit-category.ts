@@ -5,7 +5,11 @@ export const editCategoryDto = z.object({
   name: z
     .string({ invalid_type_error: 'Name must be a string' })
     .nonempty('Please enter category name'),
-  description: z.string().max(255).optional(),
+  description: z
+    .string({
+      invalid_type_error: 'Description must be a string',
+    })
+    .max(255),
   id: z.string().nonempty(),
 });
 

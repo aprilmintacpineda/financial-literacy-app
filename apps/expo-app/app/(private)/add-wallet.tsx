@@ -62,7 +62,7 @@ export default function AddWallet () {
       <FormNumberInput
         control={control}
         name="amount"
-        label="Initial Amount"
+        label="Current Balance"
       />
       <FormSelectOptions
         control={control}

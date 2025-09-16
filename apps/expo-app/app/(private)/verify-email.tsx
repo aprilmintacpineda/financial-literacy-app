@@ -31,7 +31,7 @@ export default function VerifyEmail () {
   const onSubmit = handleSubmit(async data => {
     try {
       await verifyEmail.mutateAsync(data);
-      router.navigate('/transactions');
+      router.replace('/transactions');
     } catch (_error) {
       console.log(_error);
 

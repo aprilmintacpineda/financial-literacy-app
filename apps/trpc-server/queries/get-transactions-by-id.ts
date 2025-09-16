@@ -7,13 +7,13 @@ const getTransactionByIdQuery = verifiedUserProcedure
     z.object({
       organizationId: z.string(),
       transactionId: z.string(),
-    })
+    }),
   )
   .query(async ({ input }) => {
     const transaction =
       await TransactionsRepository.getTransactionById(
         input.organizationId,
-        input.transactionId
+        input.transactionId,
       );
 
     return transaction?.publicData || null;

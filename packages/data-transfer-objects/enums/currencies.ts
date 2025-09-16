@@ -169,11 +169,11 @@ export type CurrencyName =
   (typeof supportedCurrencies)[number]['name'];
 
 export const supportedCurrenciesCodes = supportedCurrencies.map(
-  currency => currency.code
+  currency => currency.code,
 ) as [CurrencyCode, ...CurrencyCode[]];
 
 export const supportedCurrenciesNames = supportedCurrencies.map(
-  currency => currency.name
+  currency => currency.name,
 ) as [CurrencyName, ...CurrencyName[]];
 
 export const currenciesOptions = supportedCurrencies.map(
@@ -182,5 +182,5 @@ export const currenciesOptions = supportedCurrencies.map(
       label: `${code} - ${name}`,
       value: code,
     };
-  }
+  },
 );

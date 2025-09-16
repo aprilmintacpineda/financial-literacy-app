@@ -16,6 +16,7 @@ import verifyEmailMutation from './mutations/verify-email';
 import getCategoriesQuery from './queries/get-categories';
 import getTagsQuery from './queries/get-tags';
 import getTransactionsQuery from './queries/get-transactions';
+import getTransactionByIdQuery from './queries/get-transactions-by-id';
 import getWalletsQuery from './queries/get-wallets';
 import { trpc } from './trpc';
 
@@ -36,6 +37,7 @@ export const appRouter = trpc.router({
   getWalletsQuery,
   editWalletMutation,
   getTransactionsQuery,
+  getTransactionByIdQuery,
 
   // categories
   editCategoryMutation,

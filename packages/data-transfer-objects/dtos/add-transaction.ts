@@ -1,8 +1,5 @@
 import z from 'zod';
-import {
-  supportedCurrenciesCodes,
-  supportedTransactionTypes,
-} from '../enums';
+import { supportedTransactionTypes } from '../enums';
 
 export const addTransactionDto = z.object({
   organizationId: z.string().nonempty(),
@@ -32,10 +29,6 @@ export const addTransactionDto = z.object({
   transactionType: z.enum(supportedTransactionTypes, {
     invalid_type_error: 'Please select a transaction type',
     required_error: 'Please select a transaction type',
-  }),
-  currency: z.enum(supportedCurrenciesCodes, {
-    invalid_type_error: 'Please select currency from the options',
-    required_error: 'Please select a currency',
   }),
   tagIds: z.array(z.string().nonempty()),
 });

@@ -47,7 +47,13 @@ const addTransactionMutation = verifiedUserProcedure
       );
 
       const transactionId =
-        await TransactionsRepository.createTransaction(input, trx);
+        await TransactionsRepository.createTransaction(
+          {
+            ...input,
+            currency: wallet.currency,
+          },
+          trx,
+        );
 
       await allFulfilledOrThrow(
         tagIds.map(tagId =>

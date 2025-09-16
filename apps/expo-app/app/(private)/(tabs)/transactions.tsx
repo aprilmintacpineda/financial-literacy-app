@@ -103,7 +103,7 @@ export default function TransactionsTab () {
                   >
                     {isExpense ? '-' : '+'}
                     {new Intl.NumberFormat(undefined, {
-                      currency: currency,
+                      currency,
                       style: 'currency',
                     }).format(amount)}
                   </Text>

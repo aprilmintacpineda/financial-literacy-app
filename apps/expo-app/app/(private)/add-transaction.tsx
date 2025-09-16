@@ -3,10 +3,7 @@ import {
   type AddTransactionDto,
   addTransactionDto,
 } from '@packages/data-transfer-objects/dtos';
-import {
-  currenciesOptions,
-  supportedTransactionTypes,
-} from '@packages/data-transfer-objects/enums';
+import { supportedTransactionTypes } from '@packages/data-transfer-objects/enums';
 import { useRouter } from 'expo-router';
 import { useMemo } from 'react';
 import { useForm } from 'react-hook-form';
@@ -43,7 +40,6 @@ export default function AddTransaction () {
       categoryId: '',
       walletId: '',
       amount: 0,
-      currency: 'PHP',
       description: '',
       transactionDate: now,
       transactionType: 'Expense',
@@ -77,13 +73,6 @@ export default function AddTransaction () {
         control={control}
         name="amount"
         label="Amount"
-      />
-      <FormSelectOptions
-        control={control}
-        name="currency"
-        label="Currency"
-        options={currenciesOptions}
-        isSearchable
       />
       <FormSelectOptions
         control={control}

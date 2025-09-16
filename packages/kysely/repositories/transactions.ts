@@ -2,6 +2,7 @@ import {
   type AddTransactionDto,
   type EditTransactionDto,
 } from '@packages/data-transfer-objects/dtos';
+import { type CurrencyCode } from '@packages/data-transfer-objects/enums';
 import { type Transaction } from 'kysely';
 import { database } from '../database';
 import {
@@ -146,7 +147,9 @@ function mapResultsToModel (
 
 export class TransactionsRepository {
   static async createTransaction (
-    values: Omit<AddTransactionDto, 'tagIds'>,
+    values: Omit<AddTransactionDto, 'tagIds'> & {
+      currency: CurrencyCode;
+    },
     trx?: Transaction<DB>,
   ) {
     const connection = trx ?? database;

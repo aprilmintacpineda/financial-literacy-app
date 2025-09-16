@@ -1,15 +1,14 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
-  type EditTransactionDto,
+  type EditExpenseOrIncomeTransactionDto,
   editTransactionDto,
+  type EditTransferOrRepaymentTransactionDto,
 } from '@packages/data-transfer-objects/dtos';
-import {
-  currenciesOptions,
-  supportedTransactionTypes,
-} from '@packages/data-transfer-objects/enums';
+import { supportedTransactionTypes } from '@packages/data-transfer-objects/enums';
 import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
-import { View } from 'react-native';
+import { ActivityIndicator, View } from 'react-native';
 import FormMultiSelectOptionsAsync from '../../components/forms/multi-select-options-async';
 import FormNumberInput from '../../components/forms/number-input';
 import FormSelectOptions from '../../components/forms/select-options';
@@ -33,34 +32,59 @@ const transactionTypeOptions = supportedTransactionTypes.map(
 export default function EditTransaction () {
   const { activeOrganization } = useAuthContext(true);
   const router = useRouter();
-  const {
-    id,
-    organizationId,
-    amount,
-    categoryId,
-    currency,
-    tagIds,
-    transactionDate,
-    transactionType,
-    walletId,
-    description,
-  } = useLocalSearchParams<EditTransactionParam>();
+  const { id } = useLocalSearchParams<EditTransactionParam>();
+  const trpcUtils = trpc.useUtils();
+  const wasLoading = useRef(true);
 
-  const { control, handleSubmit } = useForm({
+  const {
+    control,
+    handleSubmit,
+    watch,
+    setValue,
+    formState: { isLoading },
+    subscribe,
+  } = useForm({
     resolver: zodResolver(editTransactionDto),
-    values: {
-      id,
-      organizationId,
-      categoryId,
-      walletId,
-      amount: Number(amount),
-      currency,
-      description,
-      transactionDate: new Date(transactionDate),
-      transactionType,
-      tagIds: tagIds ? tagIds.split(',') : [],
-    } satisfies EditTransactionDto,
     mode: 'all',
+    defaultValues: async () => {
+      const response = await trpcUtils.getTransactionByIdQuery.fetch(
+        {
+          organizationId: activeOrganization.id,
+          transactionId: id,
+        },
+      );
+
+      if (
+        response.transactionType === 'Repayment' ||
+        response.transactionType === 'Transfer'
+      ) {
+        return {
+          id: response.id,
+          amount: response.amount,
+          description: response.description,
+          transactionDate: response.transactionDate,
+          transactionType: response.transactionType,
+          walletId: response.wallet.id,
+          fromWalletId: response.fromWalletId!,
+          tagIds: response.tags.map(tag => tag.id),
+          exchangeRate: response.exchangeRate,
+          organizationId: response.organizationId,
+        } satisfies EditTransferOrRepaymentTransactionDto;
+      }
+
+      return {
+        id: response.id,
+        amount: response.amount,
+        description: response.description,
+        transactionDate: response.transactionDate,
+        transactionType: response.transactionType,
+        walletId: response.wallet.id,
+        categoryId: response.categoryId!,
+        tagIds: response.tags.map(tag => tag.id),
+        exchangeRate: response.exchangeRate,
+        organizationId: response.organizationId,
+      } satisfies EditExpenseOrIncomeTransactionDto;
+    },
   });
 
   const { mutateAsync } = trpc.editTransactionMutation.useMutation();
@@ -77,6 +101,47 @@ export default function EditTransaction () {
     }
   });
 
+  const getWalletsQuery = trpc.getWalletsQuery.useQuery({
+    organizationId: activeOrganization.id,
+  });
+
+  const getCategoriesQuery = trpc.getCategoriesQuery.useQuery({
+    organizationId: activeOrganization.id,
+  });
+
+  const getTagsQuery = trpc.getTagsQuery.useQuery({
+    organizationId: activeOrganization.id,
+  });
+
+  const transactionType = watch('transactionType');
+
+  useEffect(() => {
+    return subscribe({
+      name: 'transactionType',
+      callback: () => {
+        if (wasLoading.current) {
+          wasLoading.current = false;
+          return;
+        }
+
+        setValue('fromWalletId', '', { shouldValidate: true });
+        setValue('categoryId', '', { shouldValidate: true });
+      },
+    });
+  }, [subscribe]);
+
+  if (isLoading) {
+    return (
+      <View className="flex-1 items-center pt-20">
+        <ActivityIndicator size={15} />
+      </View>
+    );
+  }
+
+  const requireFromWallet =
+    transactionType === 'Transfer' ||
+    transactionType === 'Repayment';
+
   return (
     <View className="p-5">
       <FormTextInput
@@ -91,24 +156,30 @@ export default function EditTransaction () {
       />
       <FormSelectOptions
         control={control}
-        name="currency"
-        label="Currency"
-        options={currenciesOptions}
-        isSearchable
-      />
-      <FormSelectOptions
-        control={control}
         name="transactionType"
         label="Transaction Type"
         options={transactionTypeOptions}
+        isDisabled
       />
+      {requireFromWallet && (
+        <FormSelectOptionsAsync
+          control={control}
+          name="fromWalletId"
+          label="From Wallet"
+          queryResult={getWalletsQuery}
+          mapDataToOptions={data => {
+            return {
+              label: data.name,
+              value: data.id,
+            };
+          }}
+        />
+      )}
       <FormSelectOptionsAsync
         control={control}
         name="walletId"
-        label="Wallet"
-        queryResult={trpc.getWalletsQuery.useQuery({
-          organizationId: activeOrganization.id,
-        })}
+        label={requireFromWallet ? 'To Wallet' : 'Wallet'}
+        queryResult={getWalletsQuery}
         mapDataToOptions={data => {
           return {
             label: data.name,
@@ -116,27 +187,25 @@ export default function EditTransaction () {
           };
         }}
       />
-      <FormSelectOptionsAsync
-        control={control}
-        name="categoryId"
-        label="Category"
-        queryResult={trpc.getCategoriesQuery.useQuery({
-          organizationId: activeOrganization.id,
-        })}
-        mapDataToOptions={data => {
-          return {
-            label: data.name,
-            value: data.id,
-          };
-        }}
-      />
+      {!requireFromWallet && (
+        <FormSelectOptionsAsync
+          control={control}
+          name="categoryId"
+          label="Category"
+          queryResult={getCategoriesQuery}
+          mapDataToOptions={data => {
+            return {
+              label: data.name,
+              value: data.id,
+            };
+          }}
+        />
+      )}
       <FormMultiSelectOptionsAsync
         control={control}
         name="tagIds"
         label="Tags"
-        queryResult={trpc.getTagsQuery.useQuery({
-          organizationId: activeOrganization.id,
-        })}
+        queryResult={getTagsQuery}
         mapDataToOptions={data => {
           return {
             label: data.name,

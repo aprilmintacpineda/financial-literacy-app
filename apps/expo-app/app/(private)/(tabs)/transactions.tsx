@@ -1,25 +1,20 @@
 import { MaterialIcons } from '@expo/vector-icons';
-import { type EditTransactionDto } from '@packages/data-transfer-objects/dtos';
 import { Link } from 'expo-router';
 import { FlatList, RefreshControl, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { twMerge } from 'tailwind-merge';
 import Button from '../../../components/button';
 import { useAuthContext } from '../../../contexts/auth';
+import { useThemeColors } from '../../../themes';
 import { trpc } from '../../../utils/trpc';
 
-export type EditTransactionParam = Omit<
-  EditTransactionDto,
-  'transactionDate' | 'tagIds' | 'description' | 'amount'
-> & {
-  transactionDate: string;
-  tagIds: string;
-  description: string;
-  amount: string;
+export type EditTransactionParam = {
+  id: string;
 };
 
 export default function TransactionsTab () {
   const { activeOrganization } = useAuthContext(true);
+  const colors = useThemeColors();
 
   const { refetch, data, status, isRefetching } =
     trpc.getTransactionsQuery.useQuery({
@@ -78,13 +73,14 @@ export default function TransactionsTab () {
             currency,
             category,
             wallet,
+            fromWallet,
             tags,
             transactionDate,
             transactionType,
-            organizationId,
           },
         }) => {
           const isExpense = transactionType === 'Expense';
+          const isIncome = transactionType === 'Income';
 
           return (
             <View
@@ -98,10 +94,12 @@ export default function TransactionsTab () {
                       'text-xl font-medium',
                       isExpense
                         ? 'text-error-text'
-                        : 'text-success-text',
+                        : isIncome
+                          ? 'text-success-text'
+                          : '',
                     )}
                   >
-                    {isExpense ? '-' : '+'}
+                    {isExpense ? '-' : isIncome ? '+' : '~'}
                     {new Intl.NumberFormat(undefined, {
                       currency,
                       style: 'currency',
@@ -124,18 +122,7 @@ export default function TransactionsTab () {
                   className="rounded-full p-2"
                   href={{
                     pathname: '/edit-transaction',
-                    params: {
-                      amount: amount.toString(),
-                      currency,
-                      description,
-                      transactionDate: transactionDate.toISOString(),
-                      categoryId: category.id,
-                      organizationId,
-                      tagIds: tags.map(tag => tag.id).join(','),
-                      id,
-                      transactionType,
-                      walletId: wallet.id,
-                    } satisfies EditTransactionParam,
+                    params: { id } satisfies EditTransactionParam,
                   }}
                 />
               </View>
@@ -144,16 +131,49 @@ export default function TransactionsTab () {
                   {description}
                 </Text>
               )}
-              <Text className="text-sm" numberOfLines={1}>
-                {wallet.name} | {category.name}
-              </Text>
-              <View className="flex-row items-center gap-2">
+              {transactionType === 'Repayment' ||
+              transactionType === 'Transfer' ? (
+                <View className="flex-row items-center gap-1">
+                  <Text className="text-sm">{fromWallet!.name}</Text>
+                  <MaterialIcons
+                    name="arrow-right-alt"
+                    size={15}
+                    color={colors['--color-primary']}
+                  />
+                  <Text className="text-sm">{wallet.name}</Text>
+                </View>
+              ) : (
+                <View className="flex-row items-center gap-3">
+                  <View className="flex-row items-center gap-1">
+                    <MaterialIcons
+                      name="wallet"
+                      color={colors['--color-primary']}
+                      size={15}
+                    />
+                    <Text className="text-sm">{wallet.name}</Text>
+                  </View>
+                  <View className="flex-row items-center gap-1">
+                    <MaterialIcons
+                      name="category"
+                      color={colors['--color-primary']}
+                      size={15}
+                    />
+                    <Text className="text-sm">{category!.name}</Text>
+                  </View>
+                </View>
+              )}
+              <View className="flex-row items-center gap-1">
                 {tags.map(tag => {
                   return (
                     <View
                       key={tag.id}
-                      className="border-hairline rounded-full border-primary-border px-1"
+                      className="flex-row items-center"
                     >
+                      <MaterialIcons
+                        name="tag"
+                        color={colors['--color-primary']}
+                        size={15}
+                      />
                       <Text className="text-sm text-primary">
                         {tag.name}
                       </Text>

@@ -13,7 +13,6 @@ import {
   type Wallets,
 } from '../database-types';
 import { TransactionModel } from '../models/transaction';
-import { uniqueId } from '../utils/generators';
 
 function mapResultsToModel (
   results: {
@@ -26,6 +25,7 @@ function mapResultsToModel (
     transactionCurrency: Transactions['currency'];
     transactionCreatedAt: Transactions['createdAt'];
     transactionUpdatedAt: Transactions['updatedAt'];
+    transactionExchangeRate: Transactions['exchangeRate'];
     tagId: Tags['id'] | null;
     tagName: Tags['name'] | null;
     tagDescription: Tags['description'] | null;
@@ -38,11 +38,18 @@ function mapResultsToModel (
     walletCreatedAt: Wallets['createdAt'];
     walletUpdatedAt: Wallets['updatedAt'];
     walletType: Wallets['walletType'];
-    categoryId: Categories['id'];
-    categoryName: Categories['name'];
-    categoryDescription: Categories['description'];
-    categoryCreatedAt: Categories['createdAt'];
-    categoryUpdatedAt: Categories['updatedAt'];
+    fromWalletId: Wallets['id'] | null;
+    fromWalletName: Wallets['name'] | null;
+    fromWalletAmount: Wallets['amount'] | null;
+    fromWalletCurrency: Wallets['currency'] | null;
+    fromWalletCreatedAt: Wallets['createdAt'] | null;
+    fromWalletUpdatedAt: Wallets['updatedAt'] | null;
+    fromWalletType: Wallets['walletType'] | null;
+    categoryId: Categories['id'] | null;
+    categoryName: Categories['name'] | null;
+    categoryDescription: Categories['description'] | null;
+    categoryCreatedAt: Categories['createdAt'] | null;
+    categoryUpdatedAt: Categories['updatedAt'] | null;
   }[],
 ) {
   const grouppedTransactionIds: string[] = [];
@@ -60,6 +67,7 @@ function mapResultsToModel (
         transactionCurrency,
         transactionCreatedAt,
         transactionUpdatedAt,
+        transactionExchangeRate,
         walletId,
         walletName,
         walletAmount,
@@ -67,6 +75,13 @@ function mapResultsToModel (
         walletCurrency,
         walletType,
         walletUpdatedAt,
+        fromWalletId,
+        fromWalletName,
+        fromWalletAmount,
+        fromWalletCreatedAt,
+        fromWalletCurrency,
+        fromWalletType,
+        fromWalletUpdatedAt,
         categoryId,
         categoryName,
         categoryCreatedAt,
@@ -80,39 +95,8 @@ function mapResultsToModel (
       grouppedTransactionIds.push(transactionId);
 
       return models.concat(
-        new TransactionModel(
-          {
-            id: transactionId,
-            organizationId,
-            description: transactionDescription,
-            amount: transactionAmount,
-            transactionDate,
-            transactionType,
-            currency: transactionCurrency,
-            categoryId,
-            updatedAt: transactionUpdatedAt,
-            createdAt: transactionCreatedAt,
-            walletId,
-          },
-          {
-            id: categoryId,
-            description: categoryDescription,
-            createdAt: categoryCreatedAt,
-            updatedAt: categoryUpdatedAt,
-            organizationId,
-            name: categoryName,
-          },
-          {
-            id: walletId,
-            amount: walletAmount,
-            createdAt: walletCreatedAt,
-            updatedAt: walletUpdatedAt,
-            currency: walletCurrency,
-            name: walletName,
-            organizationId,
-            walletType,
-          },
-          results.reduce<Omit<Tags, 'deletedAt'>[]>(
+        new TransactionModel({
+          tags: results.reduce<Omit<Tags, 'deletedAt'>[]>(
             (
               results,
               {
@@ -138,7 +122,54 @@ function mapResultsToModel (
             },
             [],
           ),
-        ),
+          transaction: {
+            id: transactionId,
+            organizationId,
+            description: transactionDescription,
+            amount: transactionAmount,
+            transactionDate,
+            transactionType,
+            currency: transactionCurrency,
+            categoryId,
+            updatedAt: transactionUpdatedAt,
+            createdAt: transactionCreatedAt,
+            fromWalletId,
+            exchangeRate: transactionExchangeRate,
+            walletId,
+          },
+          wallet: {
+            id: walletId,
+            amount: walletAmount,
+            createdAt: walletCreatedAt,
+            updatedAt: walletUpdatedAt,
+            currency: walletCurrency,
+            name: walletName,
+            organizationId,
+            walletType,
+          },
+          fromWallet: fromWalletId
+            ? {
+                id: fromWalletId,
+                amount: fromWalletAmount!,
+                createdAt: fromWalletCreatedAt!,
+                updatedAt: fromWalletUpdatedAt!,
+                currency: fromWalletCurrency!,
+                name: fromWalletName!,
+                organizationId,
+                walletType: fromWalletType!,
+              }
+            : undefined,
+          category: categoryId
+            ? {
+                id: categoryId,
+                description: categoryDescription!,
+                createdAt: categoryCreatedAt!,
+                updatedAt: categoryUpdatedAt!,
+                organizationId,
+                name: categoryName!,
+              }
+            : undefined,
+        }),
       );
     },
     [],
@@ -148,36 +179,38 @@ function mapResultsToModel (
 export class TransactionsRepository {
   static async createTransaction (
     values: Omit<AddTransactionDto, 'tagIds'> & {
+      id: string;
       currency: CurrencyCode;
     },
     trx?: Transaction<DB>,
   ) {
     const connection = trx ?? database;
     const now = new Date();
-    const id = uniqueId();
 
     await connection
       .insertInto('transactions')
       .values({
         ...values,
-        id,
         createdAt: now,
         updatedAt: now,
       })
       .execute();
-
-    return id;
   }
 
   static async getAllTransactions (organizationId: string) {
     const transactions = await database
       .selectFrom('transactions')
-      .innerJoin(
+      .innerJoin('wallets', 'transactions.walletId', 'wallets.id')
+      .leftJoin(
         'categories',
         'transactions.categoryId',
         'categories.id',
       )
-      .innerJoin('wallets', 'transactions.walletId', 'wallets.id')
+      .leftJoin(
+        'wallets as fromWallet',
+        'transactions.fromWalletId',
+        'fromWallet.id',
+      )
       .leftJoin(
         'transaction_tags',
         'transactions.id',
@@ -198,6 +231,7 @@ export class TransactionsRepository {
         'transactions.currency as transactionCurrency',
         'transactions.createdAt as transactionCreatedAt',
         'transactions.updatedAt as transactionUpdatedAt',
+        'transactions.exchangeRate as transactionExchangeRate',
         'tags.id as tagId',
         'tags.name as tagName',
         'tags.description as tagDescription',
@@ -210,6 +244,13 @@ export class TransactionsRepository {
         'wallets.createdAt as walletCreatedAt',
         'wallets.updatedAt as walletUpdatedAt',
         'wallets.walletType as walletType',
+        'fromWallet.id as fromWalletId',
+        'fromWallet.name as fromWalletName',
+        'fromWallet.amount as fromWalletAmount',
+        'fromWallet.currency as fromWalletCurrency',
+        'fromWallet.createdAt as fromWalletCreatedAt',
+        'fromWallet.updatedAt as fromWalletUpdatedAt',
+        'fromWallet.walletType as fromWalletType',
         'categories.id as categoryId',
         'categories.name as categoryName',
         'categories.description as categoryDescription',
@@ -233,12 +274,17 @@ export class TransactionsRepository {
   ) {
     const transactions = await database
       .selectFrom('transactions')
-      .innerJoin(
+      .innerJoin('wallets', 'transactions.walletId', 'wallets.id')
+      .leftJoin(
         'categories',
         'transactions.categoryId',
         'categories.id',
       )
-      .innerJoin('wallets', 'transactions.walletId', 'wallets.id')
+      .leftJoin(
+        'wallets as fromWallet',
+        'transactions.fromWalletId',
+        'fromWallet.id',
+      )
       .leftJoin(
         'transaction_tags',
         'transactions.id',
@@ -259,6 +305,7 @@ export class TransactionsRepository {
         'transactions.currency as transactionCurrency',
         'transactions.createdAt as transactionCreatedAt',
         'transactions.updatedAt as transactionUpdatedAt',
+        'transactions.exchangeRate as transactionExchangeRate',
         'tags.id as tagId',
         'tags.name as tagName',
         'tags.description as tagDescription',
@@ -271,6 +318,13 @@ export class TransactionsRepository {
         'wallets.createdAt as walletCreatedAt',
         'wallets.updatedAt as walletUpdatedAt',
         'wallets.walletType as walletType',
+        'fromWallet.id as fromWalletId',
+        'fromWallet.name as fromWalletName',
+        'fromWallet.amount as fromWalletAmount',
+        'fromWallet.currency as fromWalletCurrency',
+        'fromWallet.createdAt as fromWalletCreatedAt',
+        'fromWallet.updatedAt as fromWalletUpdatedAt',
+        'fromWallet.walletType as fromWalletType',
         'categories.id as categoryId',
         'categories.name as categoryName',
         'categories.description as categoryDescription',

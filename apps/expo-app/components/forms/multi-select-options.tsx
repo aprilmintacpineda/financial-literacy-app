@@ -20,6 +20,7 @@ export default function FormMultiSelectOptions<
 > ({
   control,
   name,
+  isDisabled,
   ...selectOptionsProps
 }: FormMultiSelectOptionsProps<T>) {
   const { field, fieldState, formState } = useController({
@@ -33,7 +34,7 @@ export default function FormMultiSelectOptions<
       errorMessage={fieldState.error?.message}
       values={field.value}
       onChange={field.onChange}
-      isDisabled={formState.isSubmitting}
+      isDisabled={formState.isSubmitting || isDisabled}
     />
   );
 }

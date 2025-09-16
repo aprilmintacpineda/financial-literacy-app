@@ -18,6 +18,7 @@ type FormSelectOptionsProps<T extends FieldValues> = Omit<
 export default function FormSelectOptions<T extends FieldValues> ({
   control,
   name,
+  isDisabled,
   ...selectOptionsProps
 }: FormSelectOptionsProps<T>) {
   const { field, fieldState, formState } = useController({
@@ -31,7 +32,7 @@ export default function FormSelectOptions<T extends FieldValues> ({
       errorMessage={fieldState.error?.message}
       value={field.value}
       onChange={field.onChange}
-      isDisabled={formState.isSubmitting}
+      isDisabled={formState.isSubmitting || isDisabled}
     />
   );
 }

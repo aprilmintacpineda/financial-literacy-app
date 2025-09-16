@@ -25,6 +25,7 @@ export default function FormMultiSelectOptionsAsync<
 > ({
   control,
   name,
+  isDisabled,
   ...selectOptionsAsyncProps
 }: FormMultiSelectOptionsAsyncProps<T, TData>) {
   const { field, fieldState, formState } = useController({
@@ -38,7 +39,7 @@ export default function FormMultiSelectOptionsAsync<
       errorMessage={fieldState.error?.message}
       values={field.value}
       onChange={field.onChange}
-      isDisabled={formState.isSubmitting}
+      isDisabled={formState.isSubmitting || isDisabled}
     />
   );
 }

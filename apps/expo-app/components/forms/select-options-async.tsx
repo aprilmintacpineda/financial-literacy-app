@@ -25,6 +25,7 @@ export default function FormSelectOptionsAsync<
 > ({
   control,
   name,
+  isDisabled,
   ...selectOptionsAsyncProps
 }: FormSelectOptionsAsyncProps<T, TData>) {
   const { field, fieldState, formState } = useController({
@@ -38,7 +39,7 @@ export default function FormSelectOptionsAsync<
       errorMessage={fieldState.error?.message}
       value={field.value}
       onChange={field.onChange}
-      isDisabled={formState.isSubmitting}
+      isDisabled={formState.isSubmitting || isDisabled}
     />
   );
 }

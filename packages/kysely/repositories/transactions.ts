@@ -201,6 +201,8 @@ export class TransactionsRepository {
         updatedAt: now,
       })
       .execute();
+
+    return id;
   }
 
   static async getAllTransactions (organizationId: string) {

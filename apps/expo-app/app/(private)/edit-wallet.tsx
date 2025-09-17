@@ -26,7 +26,12 @@ export default function EditWallet () {
     mode: 'all',
   });
 
-  const { mutateAsync } = trpc.editWalletMutation.useMutation();
+  const utils = trpc.useUtils();
+  const { mutateAsync } = trpc.editWalletMutation.useMutation({
+    onSuccess: () => {
+      utils.getWalletsQuery.invalidate();
+    },
+  });
 
   const onSubmit = handleSubmit(async data => {
     try {

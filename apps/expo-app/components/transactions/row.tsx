@@ -24,6 +24,7 @@ export default function TransactionRow ({ transaction }: Props) {
   const { mutate } = trpc.deleteTransactionMutation.useMutation({
     onSuccess: () => {
       utils.getTransactionsQuery.invalidate();
+      utils.getWalletsQuery.invalidate();
     },
   });
 

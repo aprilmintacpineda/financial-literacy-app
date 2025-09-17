@@ -42,7 +42,12 @@ export default function AddWallet () {
     mode: 'all',
   });
 
-  const { mutateAsync } = trpc.addWalletMutation.useMutation();
+  const utils = trpc.useUtils();
+  const { mutateAsync } = trpc.addWalletMutation.useMutation({
+    onSuccess: () => {
+      utils.getWalletsQuery.invalidate();
+    },
+  });
 
   const onSubmit = handleSubmit(async data => {
     try {

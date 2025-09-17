@@ -87,7 +87,13 @@ export default function EditTransaction () {
     },
   });
 
-  const { mutateAsync } = trpc.editTransactionMutation.useMutation();
+  const utils = trpc.useUtils();
+  const { mutateAsync } = trpc.editTransactionMutation.useMutation({
+    onSuccess: () => {
+      utils.getTransactionsQuery.invalidate();
+      utils.getWalletsQuery.invalidate();
+    },
+  });
 
   const onSubmit = handleSubmit(async data => {
     try {

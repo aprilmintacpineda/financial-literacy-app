@@ -26,7 +26,12 @@ export default function AddCategory () {
     mode: 'all',
   });
 
-  const { mutateAsync } = trpc.addCategoryMutation.useMutation();
+  const utils = trpc.useUtils();
+  const { mutateAsync } = trpc.addCategoryMutation.useMutation({
+    onSuccess: () => {
+      utils.getCategoriesQuery.invalidate();
+    },
+  });
 
   const onSubmit = handleSubmit(async data => {
     try {

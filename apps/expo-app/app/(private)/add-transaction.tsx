@@ -47,7 +47,13 @@ export default function AddTransaction () {
     mode: 'all',
   });
 
-  const { mutateAsync } = trpc.addTransactionMutation.useMutation();
+  const utils = trpc.useUtils();
+  const { mutateAsync } = trpc.addTransactionMutation.useMutation({
+    onSuccess: () => {
+      utils.getTransactionsQuery.invalidate();
+      utils.getWalletsQuery.invalidate();
+    },
+  });
 
   const onSubmit = handleSubmit(async data => {
     try {

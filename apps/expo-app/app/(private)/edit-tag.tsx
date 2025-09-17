@@ -27,7 +27,12 @@ export default function EditTag () {
     mode: 'all',
   });
 
-  const { mutateAsync } = trpc.editTagMutation.useMutation();
+  const utils = trpc.useUtils();
+  const { mutateAsync } = trpc.editTagMutation.useMutation({
+    onSuccess: () => {
+      utils.getTagsQuery.invalidate();
+    },
+  });
 
   const onSubmit = handleSubmit(async data => {
     try {

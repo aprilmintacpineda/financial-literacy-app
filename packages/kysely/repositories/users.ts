@@ -177,66 +177,39 @@ export class UsersRepository {
 
   static async createUser (
     {
+      id: _id,
       email,
       name,
       password,
       emailVerificationCode,
-    }: SignUpDto & { emailVerificationCode: string },
+    }: SignUpDto & { emailVerificationCode: string; id?: string },
     trx?: Transaction<DB>,
   ) {
+    const hashedPassword = await bcrypt.hash(password, 12);
+    const now = new Date();
+    const id = _id ?? uniqueId();
     const connection = trx ?? database;
 
-    const userId = await connection
-      .transaction()
-      .execute(async trx => {
-        const hashedPassword = await bcrypt.hash(password, 12);
-        const now = new Date();
-        const userId = uniqueId();
-        const organizationId = uniqueId();
+    await connection
+      .insertInto('users')
+      .values({
+        id,
+        email,
+        password: hashedPassword,
+        name,
+        emailVerificationCode,
+        emailVerificationCodeExpiresAt:
+          getEmailVerificationCodeExpiresAt(),
+        emailVerificationCodeTries: 0,
+        emailVerificationCodeCanSentAt:
+          getEmailVerificationCodeCanSentAt(),
+        updatedAt: now,
+        createdAt: now,
+        changePasswordVerificationCodeTries: 0,
+      })
+      .execute();
 
-        await trx
-          .insertInto('users')
-          .values({
-            id: userId,
-            email,
-            password: hashedPassword,
-            name,
-            emailVerificationCode,
-            emailVerificationCodeExpiresAt:
-              getEmailVerificationCodeExpiresAt(),
-            emailVerificationCodeTries: 0,
-            emailVerificationCodeCanSentAt:
-              getEmailVerificationCodeCanSentAt(),
-            updatedAt: now,
-            createdAt: now,
-            changePasswordVerificationCodeTries: 0,
-          })
-          .execute();
-
-        await trx
-          .insertInto('organizations')
-          .values({
-            id: organizationId,
-            name: 'Personal Finance',
-            createdAt: now,
-            updatedAt: now,
-          })
-          .execute();
-
-        await trx
-          .insertInto('organization_users')
-          .values({
-            userId,
-            organizationId,
-            createdAt: now,
-            updatedAt: now,
-          })
-          .execute();
-
-        return userId;
-      });
-
-    return userId;
+    return id;
   }
 
   static async updateUser (

@@ -1,4 +1,6 @@
 export * from './add-category';
+export * from './add-organization';
+export * from './add-organization-user';
 export * from './add-tag';
 export * from './add-transaction';
 export * from './add-wallet';

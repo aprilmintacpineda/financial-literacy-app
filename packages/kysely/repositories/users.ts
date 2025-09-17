@@ -34,6 +34,7 @@ function mapSingleUserToModel (
     userChangePasswordVerificationCodeCanSentAt: Users['changePasswordVerificationCodeCanSentAt'];
     organizationId: OrganizationUsers['organizationId'];
     organizationName: Organizations['name'];
+    organizationDescription: Organizations['description'];
     organizationCreatedAt: Organizations['createdAt'];
     organizationUpdatedAt: Organizations['updatedAt'];
   }[],
@@ -69,6 +70,7 @@ function mapSingleUserToModel (
       return {
         id: result.organizationId,
         name: result.organizationName,
+        description: result.organizationDescription,
         createdAt: result.organizationCreatedAt,
         updatedAt: result.organizationUpdatedAt,
       };
@@ -112,6 +114,7 @@ export class UsersRepository {
         'users.changePasswordVerificationCodeCanSentAt as userChangePasswordVerificationCodeCanSentAt',
         'organizations.id as organizationId',
         'organizations.name as organizationName',
+        'organizations.description as organizationDescription',
         'organizations.createdAt as organizationCreatedAt',
         'organizations.updatedAt as organizationUpdatedAt',
       ])
@@ -161,6 +164,7 @@ export class UsersRepository {
         'users.changePasswordVerificationCodeCanSentAt as userChangePasswordVerificationCodeCanSentAt',
         'organizations.id as organizationId',
         'organizations.name as organizationName',
+        'organizations.description as organizationDescription',
         'organizations.createdAt as organizationCreatedAt',
         'organizations.updatedAt as organizationUpdatedAt',
       ])

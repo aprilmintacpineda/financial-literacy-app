@@ -374,4 +374,22 @@ export class TransactionsRepository {
       )
       .execute();
   }
+
+  static async deleteTransaction (
+    organizationId: string,
+    transactionId: string,
+    trx?: Transaction<DB>,
+  ) {
+    const connection = trx ?? database;
+
+    await connection
+      .deleteFrom('transactions')
+      .where(eb =>
+        eb.and([
+          eb('organizationId', '=', organizationId),
+          eb('id', '=', transactionId),
+        ]),
+      )
+      .execute();
+  }
 }

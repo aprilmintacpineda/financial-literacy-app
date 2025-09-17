@@ -16,3 +16,29 @@ export function alertMessage (
     message ?? titleOrMessage,
   );
 }
+
+export function alertDialog ({
+  title,
+  message,
+  onCancel,
+  onConfirm,
+}: {
+  title?: string;
+  message: string;
+  onCancel?: () => void;
+  onConfirm?: () => void;
+}) {
+  Alert.alert(title ?? '', message, [
+    {
+      isPreferred: true,
+      style: 'cancel',
+      text: 'Abort',
+      onPress: onCancel,
+    },
+    {
+      style: 'destructive',
+      text: 'Confirm',
+      onPress: onConfirm,
+    },
+  ]);
+}

@@ -9,7 +9,9 @@ export const editCategoryDto = z.object({
     .string({
       invalid_type_error: 'Description must be a string',
     })
-    .max(255),
+    .max(255)
+    .optional()
+    .nullable(),
   id: z.string().nonempty(),
 });
 

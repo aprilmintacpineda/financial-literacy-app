@@ -13,7 +13,8 @@ const addTransactionBaseSchema = z.object({
       invalid_type_error: 'Description must be a string',
     })
     .max(255)
-    .optional(),
+    .optional()
+    .nullable(),
   amount: z
     .number({
       invalid_type_error: 'Amount must be a number',

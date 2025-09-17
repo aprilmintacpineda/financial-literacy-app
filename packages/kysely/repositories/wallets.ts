@@ -16,12 +16,17 @@ function mapResultToModel (result: Wallets) {
 
 export class WalletsRepository {
   static async createWallet (
-    values: AddWalletDto,
+    {
+      id: _id,
+      ...values
+    }: AddWalletDto & {
+      id?: string;
+    },
     trx?: Transaction<DB>,
   ) {
     const connection = trx ?? database;
     const now = new Date();
-    const id = uniqueId();
+    const id = _id ?? uniqueId();
 
     await connection
       .insertInto('wallets')

@@ -15,10 +15,13 @@ function mapResultsToModel (result: Tags) {
 }
 
 export class TagsRepository {
-  static async createTag (values: AddTagDto, trx?: Transaction<DB>) {
+  static async createTag (
+    { id: _id, ...values }: AddTagDto & { id?: string },
+    trx?: Transaction<DB>,
+  ) {
     const connection = trx ?? database;
     const now = new Date();
-    const id = uniqueId();
+    const id = _id ?? uniqueId();
 
     await connection
       .insertInto('tags')

@@ -13,6 +13,7 @@ import {
   type Wallets,
 } from '../database-types';
 import { TransactionModel } from '../models/transaction';
+import { uniqueId } from '../utils/generators';
 
 function mapResultsToModel (
   results: {
@@ -178,19 +179,24 @@ function mapResultsToModel (
 
 export class TransactionsRepository {
   static async createTransaction (
-    values: Omit<AddTransactionDto, 'tagIds'> & {
-      id: string;
+    {
+      id: _id,
+      ...values
+    }: Omit<AddTransactionDto, 'tagIds'> & {
+      id?: string;
       currency: CurrencyCode;
     },
     trx?: Transaction<DB>,
   ) {
     const connection = trx ?? database;
     const now = new Date();
+    const id = _id ?? uniqueId();
 
     await connection
       .insertInto('transactions')
       .values({
         ...values,
+        id,
         createdAt: now,
         updatedAt: now,
       })

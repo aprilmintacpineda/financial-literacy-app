@@ -15,12 +15,17 @@ function mapResultsToModel (result: Categories) {
 
 export class CategoriesRepository {
   static async createCategory (
-    values: AddCategoryDto,
+    {
+      id: _id,
+      ...values
+    }: AddCategoryDto & {
+      id?: string;
+    },
     trx?: Transaction<DB>,
   ) {
     const connection = trx ?? database;
     const now = new Date();
-    const id = uniqueId();
+    const id = _id ?? uniqueId();
 
     await connection
       .insertInto('categories')

@@ -19,7 +19,10 @@ const addTransactionBaseSchema = z.object({
     .number({
       invalid_type_error: 'Amount must be a number',
     })
-    .gt(0, 'Amount must be greater than 0'),
+    .gt(0, 'Amount must be greater than 0')
+    .refine(num => num.toString().split('.')[1].length <= 2, {
+      message: 'Max precision is 2 decimal places',
+    }),
   exchangeRate: z
     .number({
       invalid_type_error: 'Amount must be a number',
@@ -56,7 +59,7 @@ const expenseOrIncomeSchema = addTransactionBaseSchema.extend({
 
 export const addTransactionDto = z.discriminatedUnion(
   'transactionType',
-  [repaymentOrTransferSchema, expenseOrIncomeSchema],
+  [repaymentOrTransferSchema, expenseOrIncomeSchema]
 );
 
 export type AddTransactionDto = z.infer<typeof addTransactionDto>;

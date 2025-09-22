@@ -4,12 +4,14 @@ import {
   type Transactions,
   type Wallets,
 } from '../database-types';
+import { intToFloat } from '../utils/numbers';
 import { CategoryModel } from './category';
 import { TagModel } from './tag';
 import { WalletModel } from './wallet';
 
 export class TransactionModel
-  implements Omit<Transactions, 'deletedAt'> {
+  implements Omit<Transactions, 'deletedAt'>
+{
   private data: Omit<Transactions, 'deletedAt'> & {
     category?: CategoryModel;
     wallet: WalletModel;
@@ -17,7 +19,7 @@ export class TransactionModel
     tags: TagModel[];
   };
 
-  constructor ({
+  constructor({
     tags,
     transaction,
     wallet,
@@ -41,9 +43,10 @@ export class TransactionModel
     };
   }
 
-  get publicData () {
+  get publicData() {
     return {
       ...this.data,
+      amount: intToFloat(this.data.amount),
       category: this.data.category?.publicData,
       wallet: this.data.wallet.publicData,
       tags: this.data.tags.map(tag => tag.publicData),
@@ -51,59 +54,59 @@ export class TransactionModel
     };
   }
 
-  get id () {
+  get id() {
     return this.data.id;
   }
 
-  get amount () {
+  get amount() {
     return this.data.amount;
   }
 
-  get currency () {
+  get currency() {
     return this.data.currency;
   }
 
-  get categoryId () {
+  get categoryId() {
     return this.data.categoryId;
   }
 
-  get description () {
+  get description() {
     return this.data.description;
   }
 
-  get transactionDate () {
+  get transactionDate() {
     return this.data.transactionDate;
   }
 
-  get transactionType () {
+  get transactionType() {
     return this.data.transactionType;
   }
 
-  get walletId () {
+  get walletId() {
     return this.data.walletId;
   }
 
-  get organizationId () {
+  get organizationId() {
     return this.data.organizationId;
   }
 
-  get createdAt () {
+  get createdAt() {
     return this.data.createdAt;
   }
 
-  get updatedAt () {
+  get updatedAt() {
     return this.data.updatedAt;
   }
 
-  get tags () {
+  get tags() {
     return this.data.tags;
   }
 
-  get fromWalletId () {
+  get fromWalletId() {
     return this.data.fromWalletId;
   }
 
-  get exchangeRate () {
+  get exchangeRate() {
     return this.data.exchangeRate;
   }
 }

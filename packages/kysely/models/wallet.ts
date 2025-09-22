@@ -1,47 +1,51 @@
 import { type Wallets } from '../database-types';
+import { intToFloat } from '../utils/numbers';
 
 export class WalletModel implements Omit<Wallets, 'deletedAt'> {
   private data: Omit<Wallets, 'deletedAt'>;
 
-  constructor (wallet: Omit<Wallets, 'deletedAt'>) {
+  constructor(wallet: Omit<Wallets, 'deletedAt'>) {
     this.data = {
       ...wallet,
     };
   }
 
-  get publicData () {
-    return this.data;
+  get publicData() {
+    return {
+      ...this.data,
+      amount: intToFloat(this.data.amount),
+    };
   }
 
-  get id () {
+  get id() {
     return this.data.id;
   }
 
-  get name () {
+  get name() {
     return this.data.name;
   }
 
-  get amount () {
+  get amount() {
     return this.data.amount;
   }
 
-  get currency () {
+  get currency() {
     return this.data.currency;
   }
 
-  get walletType () {
+  get walletType() {
     return this.data.walletType;
   }
 
-  get createdAt () {
+  get createdAt() {
     return this.data.createdAt;
   }
 
-  get organizationId () {
+  get organizationId() {
     return this.data.organizationId;
   }
 
-  get updatedAt () {
+  get updatedAt() {
     return this.data.updatedAt;
   }
 }

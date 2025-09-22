@@ -13,24 +13,28 @@ import {
 } from '@packages/kysely/repositories';
 import { TRPCError } from '@trpc/server';
 import { uniqueId } from '../../../packages/kysely/utils/generators';
+import {
+  floatToInt,
+  intToFloat,
+} from '../../../packages/kysely/utils/numbers';
 import { verifiedUserProcedure } from '../trpc';
 import { allFulfilledOrThrow } from '../utils/promise';
 
-async function addExpenseOrIncomeTransaction ({
+async function addExpenseOrIncomeTransaction({
   tagIds,
   ...input
 }: AddExpenseOrIncomeTransactionDto) {
   const [wallet, category, ...tags] = await Promise.all([
     WalletsRepository.getWalletById(
       input.organizationId,
-      input.walletId,
+      input.walletId
     ),
     CategoriesRepository.getCategoryById(
       input.organizationId,
-      input.categoryId,
+      input.categoryId
     ),
     ...tagIds.map(tagId =>
-      TagsRepository.getTagById(input.organizationId, tagId),
+      TagsRepository.getTagById(input.organizationId, tagId)
     ),
   ]);
 
@@ -53,13 +57,13 @@ async function addExpenseOrIncomeTransaction ({
           id: transactionId,
           currency: wallet.currency,
         },
-        trx,
+        trx
       ),
       WalletsRepository.updateAmount(
         input.organizationId,
         wallet.id,
         newAmount,
-        trx,
+        trx
       ),
     ];
 
@@ -69,28 +73,28 @@ async function addExpenseOrIncomeTransaction ({
           TransactionTagsRepository.createTransactionTag({
             transactionId,
             tagId,
-          }),
-        ),
-      ),
+          })
+        )
+      )
     );
   });
 }
 
-async function addRepaymentOrTransferTransaction ({
+async function addRepaymentOrTransferTransaction({
   tagIds,
   ...input
 }: AddTransferOrRepaymentTransactionDto) {
   const [wallet, fromWallet, ...tags] = await Promise.all([
     WalletsRepository.getWalletById(
       input.organizationId,
-      input.walletId,
+      input.walletId
     ),
     WalletsRepository.getWalletById(
       input.organizationId,
-      input.fromWalletId,
+      input.fromWalletId
     ),
     ...tagIds.map(tagId =>
-      TagsRepository.getTagById(input.organizationId, tagId),
+      TagsRepository.getTagById(input.organizationId, tagId)
     ),
   ]);
 
@@ -107,19 +111,19 @@ async function addRepaymentOrTransferTransaction ({
           id: transactionId,
           currency: wallet.currency,
         },
-        trx,
+        trx
       ),
       WalletsRepository.updateAmount(
         input.organizationId,
         fromWallet.id,
         fromWallet.amount - input.amount,
-        trx,
+        trx
       ),
       WalletsRepository.updateAmount(
         input.organizationId,
         wallet.id,
         wallet.amount + input.amount,
-        trx,
+        trx
       ),
     ];
 
@@ -129,9 +133,9 @@ async function addRepaymentOrTransferTransaction ({
           TransactionTagsRepository.createTransactionTag({
             transactionId,
             tagId,
-          }),
-        ),
-      ),
+          })
+        )
+      )
     );
   });
 }
@@ -142,10 +146,16 @@ const addTransactionMutation = verifiedUserProcedure
     switch (input.transactionType) {
       case 'Expense':
       case 'Income':
-        return addExpenseOrIncomeTransaction(input);
+        return addExpenseOrIncomeTransaction({
+          ...input,
+          amount: floatToInt(input.amount),
+        });
       case 'Repayment':
       case 'Transfer':
-        return addRepaymentOrTransferTransaction(input);
+        return addRepaymentOrTransferTransaction({
+          ...input,
+          amount: intToFloat(input.amount),
+        });
       default:
         throw new TRPCError({ code: 'BAD_REQUEST' });
     }

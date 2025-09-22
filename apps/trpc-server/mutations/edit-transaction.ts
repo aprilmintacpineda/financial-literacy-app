@@ -12,24 +12,25 @@ import {
   WalletsRepository,
 } from '@packages/kysely/repositories';
 import { TRPCError } from '@trpc/server';
+import { floatToInt } from '../../../packages/kysely/utils/numbers';
 import { verifiedUserProcedure } from '../trpc';
 import { allFulfilledOrThrow } from '../utils/promise';
 
-async function editIncomeOrExpenseTransaction ({
+async function editIncomeOrExpenseTransaction({
   tagIds,
   ...input
 }: EditExpenseOrIncomeTransactionDto) {
   const [inputWallet, category, ...tags] = await Promise.all([
     WalletsRepository.getWalletById(
       input.organizationId,
-      input.walletId,
+      input.walletId
     ),
     CategoriesRepository.getCategoryById(
       input.organizationId,
-      input.categoryId,
+      input.categoryId
     ),
     ...tagIds.map(tagId =>
-      TagsRepository.getTagById(input.organizationId, tagId),
+      TagsRepository.getTagById(input.organizationId, tagId)
     ),
   ]);
 
@@ -39,7 +40,7 @@ async function editIncomeOrExpenseTransaction ({
   const originalTransaction =
     await TransactionsRepository.getTransactionById(
       input.organizationId,
-      input.id,
+      input.id
     );
 
   if (originalTransaction.transactionType !== input.transactionType)
@@ -53,7 +54,7 @@ async function editIncomeOrExpenseTransaction ({
       // we need to revert the amount of the original wallet
       const originalWallet = (await WalletsRepository.getWalletById(
         input.organizationId,
-        originalTransaction.walletId,
+        originalTransaction.walletId
       ))!;
 
       const originalWalletRevertedAmount =
@@ -66,8 +67,8 @@ async function editIncomeOrExpenseTransaction ({
           input.organizationId,
           originalWallet.id,
           originalWalletRevertedAmount,
-          trx,
-        ),
+          trx
+        )
       );
 
       // then recalculate what the amount would be for the new wallet
@@ -81,8 +82,8 @@ async function editIncomeOrExpenseTransaction ({
           input.organizationId,
           inputWallet.id,
           newAmount,
-          trx,
-        ),
+          trx
+        )
       );
     } else {
       // we need to first revert the wallet amount to prior this transaction
@@ -101,8 +102,8 @@ async function editIncomeOrExpenseTransaction ({
           input.organizationId,
           inputWallet.id,
           newAmount,
-          trx,
-        ),
+          trx
+        )
       );
     }
 
@@ -113,8 +114,8 @@ async function editIncomeOrExpenseTransaction ({
           TransactionTagsRepository.deleteTransactionTag(
             originalTransaction.id,
             originalTag.id,
-            trx,
-          ),
+            trx
+          )
         );
       }
     });
@@ -123,7 +124,7 @@ async function editIncomeOrExpenseTransaction ({
     tagIds.forEach(tagId => {
       if (
         !originalTransaction.tags.find(
-          originalTag => originalTag.id === tagId,
+          originalTag => originalTag.id === tagId
         )
       ) {
         promises.push(
@@ -132,8 +133,8 @@ async function editIncomeOrExpenseTransaction ({
               tagId,
               transactionId: originalTransaction.id,
             },
-            trx,
-          ),
+            trx
+          )
         );
       }
     });
@@ -142,29 +143,29 @@ async function editIncomeOrExpenseTransaction ({
       TransactionsRepository.editTransaction(
         input.organizationId,
         input,
-        trx,
-      ),
+        trx
+      )
     );
 
     await allFulfilledOrThrow(promises);
   });
 }
 
-async function editTransferOrRepaymentTransaction ({
+async function editTransferOrRepaymentTransaction({
   tagIds,
   ...input
 }: EditTransferOrRepaymentTransactionDto) {
   const [inputWallet, fromWallet, ...tags] = await Promise.all([
     WalletsRepository.getWalletById(
       input.organizationId,
-      input.walletId,
+      input.walletId
     ),
     WalletsRepository.getWalletById(
       input.organizationId,
-      input.fromWalletId,
+      input.fromWalletId
     ),
     ...tagIds.map(tagId =>
-      TagsRepository.getTagById(input.organizationId, tagId),
+      TagsRepository.getTagById(input.organizationId, tagId)
     ),
   ]);
 
@@ -174,7 +175,7 @@ async function editTransferOrRepaymentTransaction ({
   const originalTransaction =
     await TransactionsRepository.getTransactionById(
       input.organizationId,
-      input.id,
+      input.id
     );
 
   if (originalTransaction.transactionType !== input.transactionType)
@@ -189,7 +190,7 @@ async function editTransferOrRepaymentTransaction ({
       const originalFromWallet =
         (await WalletsRepository.getWalletById(
           input.organizationId,
-          originalTransaction.fromWalletId!,
+          originalTransaction.fromWalletId!
         ))!;
 
       // we need to revert the previous fromWallet
@@ -198,8 +199,8 @@ async function editTransferOrRepaymentTransaction ({
           input.organizationId,
           originalFromWallet.id,
           originalFromWallet.amount + originalTransaction.amount,
-          trx,
-        ),
+          trx
+        )
       );
 
       // calculate new amount for the new fromWallet
@@ -208,8 +209,8 @@ async function editTransferOrRepaymentTransaction ({
           input.organizationId,
           fromWallet.id,
           fromWallet.amount - input.amount,
-          trx,
-        ),
+          trx
+        )
       );
     } else {
       // we need to revert the fromWallet amount to prior this transaction
@@ -225,8 +226,8 @@ async function editTransferOrRepaymentTransaction ({
           input.organizationId,
           fromWallet.id,
           newFromWalletAmount,
-          trx,
-        ),
+          trx
+        )
       );
     }
 
@@ -234,7 +235,7 @@ async function editTransferOrRepaymentTransaction ({
     if (originalTransaction.walletId !== input.walletId) {
       const originalWallet = (await WalletsRepository.getWalletById(
         input.organizationId,
-        originalTransaction.walletId,
+        originalTransaction.walletId
       ))!;
 
       // we need to revert the previous wallet
@@ -243,8 +244,8 @@ async function editTransferOrRepaymentTransaction ({
           input.organizationId,
           originalWallet.id,
           originalWallet.amount - originalTransaction.amount,
-          trx,
-        ),
+          trx
+        )
       );
 
       // calculate new amount for the new toWallet
@@ -253,8 +254,8 @@ async function editTransferOrRepaymentTransaction ({
           input.organizationId,
           inputWallet.id,
           inputWallet.amount + input.amount,
-          trx,
-        ),
+          trx
+        )
       );
     } else {
       // we need to revert the wallet amount to prior this transaction
@@ -269,8 +270,8 @@ async function editTransferOrRepaymentTransaction ({
           input.organizationId,
           inputWallet.id,
           newWalletAmount,
-          trx,
-        ),
+          trx
+        )
       );
     }
 
@@ -278,7 +279,7 @@ async function editTransferOrRepaymentTransaction ({
     tagIds.forEach(tagId => {
       if (
         !originalTransaction.tags.find(
-          originalTag => originalTag.id === tagId,
+          originalTag => originalTag.id === tagId
         )
       ) {
         promises.push(
@@ -287,8 +288,8 @@ async function editTransferOrRepaymentTransaction ({
               tagId,
               transactionId: originalTransaction.id,
             },
-            trx,
-          ),
+            trx
+          )
         );
       }
     });
@@ -297,8 +298,8 @@ async function editTransferOrRepaymentTransaction ({
       TransactionsRepository.editTransaction(
         input.organizationId,
         input,
-        trx,
-      ),
+        trx
+      )
     );
 
     await allFulfilledOrThrow(promises);
@@ -311,10 +312,16 @@ const editTransactionMutation = verifiedUserProcedure
     switch (input.transactionType) {
       case 'Expense':
       case 'Income':
-        return editIncomeOrExpenseTransaction(input);
+        return editIncomeOrExpenseTransaction({
+          ...input,
+          amount: floatToInt(input.amount),
+        });
       case 'Transfer':
       case 'Repayment':
-        return editTransferOrRepaymentTransaction(input);
+        return editTransferOrRepaymentTransaction({
+          ...input,
+          amount: floatToInt(input.amount),
+        });
       default:
         throw new TRPCError({ code: 'BAD_REQUEST' });
     }

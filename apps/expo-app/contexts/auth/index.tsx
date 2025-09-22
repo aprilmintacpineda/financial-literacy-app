@@ -1,4 +1,5 @@
 import { type PublicUserData } from '@apps/trpc-server';
+import * as secureStore from 'expo-secure-store';
 import {
   createContext,
   type PropsWithChildren,
@@ -24,12 +25,12 @@ type tAuthContext = iState & {
       activeOrganization: PublicUserData['organizations'][number];
     }
   ) => void;
-  clearAuth: () => void;
+  clearAuth: () => Promise<void>;
   login: (
     token: string,
     publicUserData: PublicUserData,
     activeOrganization: PublicUserData['organizations'][number]
-  ) => void;
+  ) => Promise<void>;
 };
 
 const AuthContext = createContext<tAuthContext>({} as tAuthContext);
@@ -52,11 +53,13 @@ export function AuthContextProvider ({
   }, []);
 
   const login = useCallback(
-    (
+    async (
       token: string,
       publicUserData: PublicUserData,
       activeOrganization: PublicUserData['organizations'][number],
     ) => {
+      await secureStore.setItemAsync('token', token);
+
       setState(oldState => {
         return {
           ...oldState,
@@ -93,7 +96,9 @@ export function AuthContextProvider ({
     [],
   );
 
-  const clearAuth = useCallback(() => {
+  const clearAuth = useCallback(async () => {
+    await secureStore.deleteItemAsync('token');
+
     setState(oldState => {
       return {
         ...oldState,

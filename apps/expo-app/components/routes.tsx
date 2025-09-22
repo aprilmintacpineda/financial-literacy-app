@@ -15,9 +15,8 @@ export default function Routes () {
     async function validateToken () {
       try {
         const { publicUserData, token } = await mutateAsync();
-        await secureStore.setItemAsync('token', token);
 
-        login(
+        await login(
           token,
           publicUserData,
           publicUserData.organizations[0],
@@ -25,8 +24,6 @@ export default function Routes () {
       } catch (_error) {
         // @todo maybe log in sentry?
         console.log(_error);
-
-        await secureStore.deleteItemAsync('token');
         clearAuth();
       }
     }

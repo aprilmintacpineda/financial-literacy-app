@@ -1,7 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { signInDto } from '@packages/data-transfer-objects/dtos';
 import { Link, Redirect, useRouter } from 'expo-router';
-import * as secureStore from 'expo-secure-store';
 import { useForm } from 'react-hook-form';
 import { Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -28,8 +27,11 @@ export default function HomeScreen () {
   const onSubmit = handleSubmit(async formData => {
     try {
       const { token, publicUserData } = await mutateAsync(formData);
-      await secureStore.setItemAsync('token', token);
-      login(token, publicUserData, publicUserData.organizations[0]);
+      await login(
+        token,
+        publicUserData,
+        publicUserData.organizations[0],
+      );
 
       if (publicUserData.isEmailVerified)
         router.replace('/transactions');

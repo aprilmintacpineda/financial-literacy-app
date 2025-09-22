@@ -1,6 +1,6 @@
 import { type Kysely } from 'kysely';
 import { createBaseTable } from '../utils/schema';
-import { cuid, names } from '../utils/types';
+import { amounts, cuid, currencyCode, names } from '../utils/types';
 
 // `any` is required here since migrations should be frozen in time. alternatively, keep a "snapshot" db interface.
 export async function up (db: Kysely<any>): Promise<void> {
@@ -8,9 +8,9 @@ export async function up (db: Kysely<any>): Promise<void> {
     .addColumn('id', cuid, col => col.primaryKey().notNull())
     .addColumn('organizationId', cuid, col => col.notNull())
     .addColumn('name', names, col => col.notNull())
-    .addColumn('amount', 'bigint', col => col.notNull())
+    .addColumn('amount', amounts, col => col.notNull())
     .addColumn('walletType', 'varchar(6)', col => col.notNull())
-    .addColumn('currency', 'varchar(3)', col => col.notNull())
+    .addColumn('currency', currencyCode, col => col.notNull())
     .execute();
 
   await db.schema

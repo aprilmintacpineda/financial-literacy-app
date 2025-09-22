@@ -13,13 +13,13 @@ type tNumberInputProps = Omit<
 > & {
   value: number;
   onValueChange: (value: number) => void;
-  maxDecimalDigits?: number;
 };
+
+const maxDecimalDigits = 2;
 
 const NumberInput = ({
   value,
   onValueChange,
-  maxDecimalDigits = 5,
   ...textInputProps
 }: tNumberInputProps) => {
   const [input, setInput] = useState(String(value));

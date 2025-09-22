@@ -1,6 +1,11 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import { Link } from 'expo-router';
-import { Text, TouchableOpacity, View } from 'react-native';
+import {
+  Pressable,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { twMerge } from 'tailwind-merge';
 import { useAuthContext } from '../../../contexts/auth';
@@ -8,7 +13,7 @@ import { useThemeColors } from '../../../themes';
 
 export default function AccountTab () {
   const themeColors = useThemeColors();
-  const { publicUserData, activeOrganization } =
+  const { publicUserData, activeOrganization, clearAuth } =
     useAuthContext(true);
 
   return (
@@ -17,18 +22,18 @@ export default function AccountTab () {
         <Text className="font-bold">Your account</Text>
       </View>
       <View className="border-b border-b-borders">
-        <Link href="/change-account-details">
-          <View className="p-5">
-            <Text>Edit account details</Text>
-          </View>
-        </Link>
-      </View>
-      <View className="border-b border-b-borders">
         <Link href="/change-password">
           <View className="p-5">
             <Text>Change password</Text>
           </View>
         </Link>
+      </View>
+      <View className="border-b border-b-borders">
+        <Pressable onPress={clearAuth}>
+          <View className="p-5">
+            <Text>Logout</Text>
+          </View>
+        </Pressable>
       </View>
       <View className="bg-disabled-border p-2">
         <Text className="font-bold">Your Teams</Text>
